@@ -18,6 +18,7 @@ const router = useRouter()
 const { mobile } = useDisplay()
 
 const homeTabIndex = ref(0)
+const timelineTabIndex = ref(0)
 const backExtensionTabIndex = ref(0)
 const searchQuery = ref('')
 const createDialogOpen = ref(false)
@@ -59,7 +60,7 @@ function goBack() {
         <v-tabs
           v-if="showHomeInlineTabs"
           v-model="homeTabIndex"
-          centered
+          align-tabs="center"
           class="mfuns-home-tabs mfuns-home-tabs--inline flex-shrink-0"
           color="white"
           hide-slider
@@ -102,15 +103,14 @@ function goBack() {
         </v-menu>
       </div>
 
-      <!-- timeline -->
+      <!-- timeline（参考站：v-tabs-slider 白色下划线，非 hide-slider） -->
       <v-tabs
         v-else-if="config.variant === 'timeline'"
-        v-model="homeTabIndex"
-        centered
-        grow
+        v-model="timelineTabIndex"
+        align-tabs="center"
+        height="48"
         class="mfuns-home-tabs mfuns-home-tabs--timeline"
         color="white"
-        hide-slider
       >
         <v-tab v-for="(label, i) in config.inlineTabs" :key="`tl-${label}`" :value="i">
           {{ label }}
@@ -182,7 +182,7 @@ function goBack() {
       <v-tabs
         v-if="config.variant === 'home' && showHomeExtensionTabs"
         v-model="homeTabIndex"
-        centered
+        align-tabs="center"
         grow
         class="mfuns-home-tabs mfuns-home-tabs--extension"
         color="white"
@@ -267,6 +267,27 @@ function goBack() {
 
 .mfuns-home-tabs--timeline {
   width: 100%;
+  flex: 1 1 auto;
+}
+
+.mfuns-app-bar:has(.mfuns-home-tabs--timeline) :deep(.v-toolbar__content) {
+  padding-inline: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.mfuns-home-tabs--timeline :deep(.v-tab) {
+  flex: 0 0 auto;
+  min-width: 72px;
+  max-width: 360px;
+  width: auto;
+}
+
+/* V2 v-tabs-slider on primary app bar */
+.mfuns-home-tabs--timeline :deep(.v-tab__slider) {
+  height: 2px;
+  opacity: 1;
+  background-color: rgb(255, 255, 255);
 }
 
 .mfuns-home-tabs :deep(.v-tab) {
