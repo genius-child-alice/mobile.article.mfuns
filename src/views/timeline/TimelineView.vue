@@ -83,9 +83,9 @@ onMounted(() => {
 
 <template>
   <div class="timeline-page">
-    <v-container fluid class="timeline-page__container py-2 px-2 px-sm-3">
-      <v-row dense>
-        <v-col cols="12" md="8" lg="7" offset-lg="1">
+    <v-container fluid class="timeline-page__container py-2">
+      <v-row dense class="timeline-page__row">
+        <v-col cols="12" md="8" lg="8">
           <v-window v-model="tabIndex" class="timeline-page__window">
             <v-window-item :value="0">
               <FeedTimelineList new-reply />
@@ -112,6 +112,7 @@ onMounted(() => {
                 <FeedUserListPanel
                   v-if="smAndDown"
                   v-model="selectUserId"
+                  layout="horizontal"
                   class="mb-2"
                   :users="followUsers"
                   @select="syncFollowFeedParams"
@@ -121,7 +122,7 @@ onMounted(() => {
           </v-window>
         </v-col>
 
-        <v-col v-if="mdAndUp" cols="12" md="4" lg="3">
+        <v-col v-if="mdAndUp" cols="12" md="4" lg="4">
           <FeedUserListPanel
             v-if="isLoggedIn"
             v-model="selectUserId"
@@ -159,6 +160,27 @@ onMounted(() => {
     100dvh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
       env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
+}
+
+/* 约为默认 v-container 水平内边距的一半 */
+.timeline-page__container {
+  padding-inline: 4px;
+}
+
+@media (min-width: 600px) {
+  .timeline-page__container {
+    padding-inline: 6px;
+  }
+}
+
+@media (min-width: 960px) {
+  .timeline-page__container {
+    padding-inline: 8px;
+  }
+}
+
+.timeline-page__row {
+  margin-inline: 0;
 }
 
 .timeline-page__window {
