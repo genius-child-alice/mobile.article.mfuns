@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import HomeCategoryPanel from '../../components/HomeCategoryPanel.vue'
 import HomeCategorySelect from '../../components/HomeCategorySelect.vue'
@@ -11,10 +11,31 @@ const { mdAndUp, lgAndUp, xs } = useDisplay()
 const { tabIndex } = useHomeTabs()
 
 const categoryId = ref(-1)
+const isLandscape = ref(false)
+
+/** lg+ 或横屏 md+：左侧分区侧栏（与参考站一致，便于与内容网格顶对齐） */
+const showCategorySidebar = computed(
+  () => lgAndUp.value || (mdAndUp.value && isLandscape.value),
+)
+
+function syncLandscape() {
+  isLandscape.value = window.matchMedia('(orientation: landscape)').matches
+}
 
 const desktopRecommendHeight = computed(() => {
   if (!mdAndUp.value) return undefined
   return `calc(100dvh - var(--mfuns-app-bar-height, 48px))`
+})
+
+onMounted(() => {
+  syncLandscape()
+  window.addEventListener('resize', syncLandscape, { passive: true })
+  window.matchMedia('(orientation: landscape)').addEventListener('change', syncLandscape)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', syncLandscape)
+  window.matchMedia('(orientation: landscape)').removeEventListener('change', syncLandscape)
 })
 </script>
 
@@ -33,10 +54,11 @@ const desktopRecommendHeight = computed(() => {
         <v-window-item :value="0">
           <div
             class="home-page__recommend d-flex overflow-hidden min-height-0"
+            :class="{ 'home-page__recommend--with-sidebar': showCategorySidebar }"
             :style="desktopRecommendHeight ? { height: desktopRecommendHeight } : undefined"
           >
             <HomeCategorySelect
-              v-if="lgAndUp"
+              v-if="showCategorySidebar"
               v-model="categoryId"
               layout="sidebar"
             />
@@ -46,7 +68,7 @@ const desktopRecommendHeight = computed(() => {
                 :category-id="categoryId"
               >
                 <HomeCategorySelect
-                  v-if="!lgAndUp"
+                  v-if="!showCategorySidebar"
                   v-model="categoryId"
                   layout="chips"
                   class="mt-2"
@@ -123,5 +145,17 @@ const desktopRecommendHeight = computed(() => {
 
 .home-page__hot-rail--lg {
   width: 400px;
+}
+
+/* 横屏侧栏分区：内容网格顶与侧栏 pa-2 第一个按钮顶对齐（侧栏 8px，网格原 ma-1 仅 4px） */
+@media (orientation: landscape) {
+  .home-page__recommend--with-sidebar :deep(.home-recommend-list__scroll) {
+    padding-top: 8px;
+    box-sizing: border-box;
+  }
+
+  .home-page__recommend--with-sidebar :deep(.home-recommend-list__scroll > .v-row) {
+    margin-top: 0 !important;
+  }
 }
 </style>
