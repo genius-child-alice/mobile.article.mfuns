@@ -86,7 +86,12 @@ function avatarSrc(path: string | undefined): string {
 
 <template>
   <!-- 参考 FeedUserListMobile + RowScroll -->
-  <v-card v-if="layout === 'horizontal'" elevation="0" class="feed-user-list-mobile">
+  <v-card
+    v-if="layout === 'horizontal'"
+    elevation="0"
+    rounded="lg"
+    class="feed-user-list-mobile"
+  >
     <div class="feed-user-list-mobile__scroll d-flex">
       <div
         v-for="entry in items"
@@ -159,7 +164,7 @@ function avatarSrc(path: string | undefined): string {
 }
 
 .feed-user-list-mobile {
-  background: transparent;
+  background: rgb(var(--v-theme-surface));
 }
 
 .feed-user-list-mobile__scroll {

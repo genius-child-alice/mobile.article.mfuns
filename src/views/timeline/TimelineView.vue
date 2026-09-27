@@ -158,31 +158,52 @@ onMounted(() => {
 <style scoped>
 .timeline-page {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  /* 相对侧栏 / 屏幕右缘的外边距（非 v-container 内边距） */
+  --timeline-edge: 4px;
+  padding-inline: calc(var(--timeline-edge) + env(safe-area-inset-left, 0px))
+    calc(var(--timeline-edge) + env(safe-area-inset-right, 0px));
   min-height: calc(
     100dvh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
       env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
 }
 
-/* 约为默认 v-container 水平内边距的一半 */
-.timeline-page__container {
-  padding-inline: 4px;
-}
-
 @media (min-width: 600px) {
-  .timeline-page__container {
-    padding-inline: 6px;
+  .timeline-page {
+    --timeline-edge: 6px;
   }
 }
 
-@media (min-width: 960px) {
-  .timeline-page__container {
-    padding-inline: 8px;
+/* 横屏：略放大与侧栏 / 右缘距离（竖屏仍用较小 --timeline-edge） */
+@media (orientation: landscape) {
+  .timeline-page {
+    --timeline-edge: 12px;
   }
+}
+
+@media (orientation: landscape) and (min-width: 960px) {
+  .timeline-page {
+    --timeline-edge: 140px;
+  }
+
+  .timeline-page__row :deep(> .v-col) {
+    padding-inline: 4px;
+  }
+}
+
+.timeline-page :deep(.timeline-page__container.v-container) {
+  padding-inline: 0 !important;
+  max-width: none !important;
 }
 
 .timeline-page__row {
   margin-inline: 0;
+}
+
+.timeline-page__row :deep(> .v-col) {
+  padding-inline: 0;
 }
 
 .timeline-page__window {

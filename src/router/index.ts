@@ -41,6 +41,7 @@ const shellFullBleedPaths = new Set([
 
 /** Login/register: full main width like reference LoginPage (not 960px column). */
 const shellStretchMainPaths = new Set([
+  '/timeline',
   '/member/login',
   '/member/register',
   '/member/reset_password',
