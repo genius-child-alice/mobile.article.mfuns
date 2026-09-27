@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import HomeCategoryPanel from '../../components/HomeCategoryPanel.vue'
 import HomeCategorySelect from '../../components/HomeCategorySelect.vue'
@@ -11,15 +11,10 @@ const { mdAndUp, lgAndUp, xs } = useDisplay()
 const { tabIndex } = useHomeTabs()
 
 const categoryId = ref(-1)
-const recommendRef = ref<InstanceType<typeof HomeRecommendList> | null>(null)
 
 const desktopRecommendHeight = computed(() => {
   if (!mdAndUp.value) return undefined
   return `calc(100dvh - var(--mfuns-app-bar-height, 48px))`
-})
-
-watch(categoryId, () => {
-  recommendRef.value?.reload()
 })
 </script>
 
@@ -30,10 +25,14 @@ watch(categoryId, () => {
       class="home-page__container pt-0 pt-sm-1"
       :class="{ 'pa-0': xs }"
     >
-      <v-window v-model="tabIndex" class="home-page__window">
+      <v-window
+        v-model="tabIndex"
+        class="home-page__window"
+        :style="desktopRecommendHeight ? { height: desktopRecommendHeight } : undefined"
+      >
         <v-window-item :value="0">
           <div
-            class="home-page__recommend d-flex overflow-hidden"
+            class="home-page__recommend d-flex overflow-hidden min-height-0"
             :style="desktopRecommendHeight ? { height: desktopRecommendHeight } : undefined"
           >
             <HomeCategorySelect
@@ -43,7 +42,6 @@ watch(categoryId, () => {
             />
             <div class="home-page__recommend-main flex-grow-1 min-width-0">
               <HomeRecommendList
-                ref="recommendRef"
                 class="home-page__feed"
                 :category-id="categoryId"
               >
@@ -91,16 +89,32 @@ watch(categoryId, () => {
   overflow: hidden;
 }
 
+@media (min-width: 600px) {
+  .home-page__container {
+    padding-inline: 12px !important;
+  }
+}
+
 .home-page__window {
   background: transparent;
 }
 
+.home-page__window :deep(.v-window__container) {
+  height: 100%;
+}
+
+.home-page__window :deep(.v-window-item) {
+  height: 100%;
+}
+
 .home-page__recommend-main {
   height: 100%;
+  min-height: 0;
 }
 
 .home-page__feed {
   height: 100%;
+  min-height: 0;
 }
 
 .home-page__hot-rail--md {

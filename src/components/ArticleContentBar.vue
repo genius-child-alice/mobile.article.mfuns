@@ -6,6 +6,8 @@ import { mfunsImageUrl } from '../utils/mfunsImageUrl'
 const props = defineProps<{
   data?: MemberHistoryResource | null
   rank?: number
+  /** 热门榜等铺底纹场景：卡片底透明 */
+  transparent?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -30,7 +32,9 @@ function formatDuration(seconds: number): string {
 <template>
   <v-card
     class="article-content-bar list d-flex overflow-hidden"
+    :class="{ 'article-content-bar--transparent': transparent }"
     elevation="0"
+    :color="transparent ? 'rgba(0, 0, 0, 0)' : undefined"
     ripple
     @click="emit('click')"
   >
@@ -70,6 +74,10 @@ function formatDuration(seconds: number): string {
 .article-content-bar {
   width: 100%;
   cursor: pointer;
+}
+
+.article-content-bar--transparent {
+  background: transparent !important;
 }
 
 .article-content-bar__cover {

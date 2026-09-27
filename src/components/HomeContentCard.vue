@@ -62,7 +62,7 @@ const showDuration = computed(
     </div>
     <div class="py-2 px-0 d-flex flex-fill">
       <div class="flex-fill d-flex flex-column" style="height: 100%">
-        <div class="card-title text-primary">
+        <div class="card-title">
           {{ data.title }}
         </div>
         <div class="d-flex align-center mt-1 text-disabled">

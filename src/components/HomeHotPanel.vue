@@ -81,6 +81,7 @@ onMounted(() => {
           :md="compact ? 12 : 6"
         >
           <ArticleContentBar
+            transparent
             :data="toBarData(item)"
             :rank="index + 1"
             @click="router.push(homeContentPath(item))"

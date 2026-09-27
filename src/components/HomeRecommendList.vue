@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import HomeContentCard from './HomeContentCard.vue'
@@ -10,6 +10,8 @@ import {
   type HomeContentItem,
 } from '../api/homeApi'
 
+const SCROLL_THRESHOLD_PX = 160
+
 const props = defineProps<{
   categoryId: number
 }>()
@@ -17,14 +19,86 @@ const props = defineProps<{
 const router = useRouter()
 const { mdAndUp } = useDisplay()
 
+const scrollRef = ref<HTMLElement | null>(null)
+
 const list = ref<HomeContentItem[]>([])
 const page = ref(1)
 const loading = ref(false)
 const loadingMore = ref(false)
 const notMore = ref(false)
 
+let scrollTarget: HTMLElement | Window | null = null
+
 function pageSize(): number {
   return mdAndUp.value ? 14 : 10
+}
+
+function canLoadMore(): boolean {
+  return !loading.value && !loadingMore.value && !notMore.value
+}
+
+function findScrollTarget(start: HTMLElement | null): HTMLElement | Window {
+  let el = start
+  while (el) {
+    const { overflowY } = getComputedStyle(el)
+    const scrollable =
+      overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay'
+    if (scrollable && el.scrollHeight > el.clientHeight + 2) {
+      return el
+    }
+    el = el.parentElement
+  }
+
+  const mainScroller = document.querySelector('.v-main__scroller')
+  if (
+    mainScroller instanceof HTMLElement &&
+    mainScroller.scrollHeight > mainScroller.clientHeight + 2
+  ) {
+    return mainScroller
+  }
+
+  return window
+}
+
+function isNearBottom(target: HTMLElement | Window): boolean {
+  if (target === window) {
+    const doc = document.documentElement
+    return doc.scrollHeight - window.scrollY - window.innerHeight < SCROLL_THRESHOLD_PX
+  }
+  const el = target as HTMLElement
+  return el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_THRESHOLD_PX
+}
+
+function tryLoadMoreFromScroll() {
+  if (!canLoadMore()) return
+  if (list.value.length === 0) return
+  if (!scrollTarget) return
+  if (!isNearBottom(scrollTarget)) return
+  void load()
+}
+
+function onScroll() {
+  tryLoadMoreFromScroll()
+}
+
+function bindScrollListener() {
+  unbindScrollListener()
+  scrollTarget = findScrollTarget(scrollRef.value)
+  if (scrollTarget === window) {
+    window.addEventListener('scroll', onScroll, { passive: true })
+  } else {
+    scrollTarget.addEventListener('scroll', onScroll, { passive: true })
+  }
+}
+
+function unbindScrollListener() {
+  if (!scrollTarget) return
+  if (scrollTarget === window) {
+    window.removeEventListener('scroll', onScroll)
+  } else {
+    scrollTarget.removeEventListener('scroll', onScroll)
+  }
+  scrollTarget = null
 }
 
 async function load(reset = false) {
@@ -34,6 +108,7 @@ async function load(reset = false) {
     notMore.value = false
   }
   if (notMore.value) return
+  if (!reset && (loading.value || loadingMore.value)) return
 
   const isFirst = list.value.length === 0 || reset
   if (isFirst) loading.value = true
@@ -44,14 +119,25 @@ async function load(reset = false) {
     let res
 
     if (props.categoryId === -1) {
-      const requestSize = reset ? size : list.value.length + size
-      res = await fetchRecommend(props.categoryId, requestSize)
-      if (res.code === 1 && Array.isArray(res.data?.list)) {
-        list.value = res.data.list
-        notMore.value = res.data.list.length < requestSize
-      } else {
+      res = await fetchRecommend(props.categoryId, size)
+      if (res.code !== 1 || !Array.isArray(res.data?.list)) {
         notMore.value = true
+        return
       }
+      const batch = res.data.list
+      if (batch.length === 0) {
+        notMore.value = true
+        return
+      }
+      if (reset) list.value = []
+      const known = new Set(list.value.map((item) => item.id))
+      const novel = batch.filter((item) => !known.has(item.id))
+      if (novel.length === 0) {
+        notMore.value = true
+        return
+      }
+      list.value.push(...novel)
+      notMore.value = batch.length < size
       return
     }
 
@@ -69,9 +155,14 @@ async function load(reset = false) {
     if (reset) list.value = []
     list.value.push(...res.data.list)
     page.value += 1
+    notMore.value = res.data.list.length < size
   } finally {
     loading.value = false
     loadingMore.value = false
+    nextTick(() => {
+      bindScrollListener()
+      tryLoadMoreFromScroll()
+    })
   }
 }
 
@@ -87,12 +178,24 @@ watch(
   { immediate: true },
 )
 
+watch(mdAndUp, () => {
+  nextTick(bindScrollListener)
+})
+
+onMounted(() => {
+  nextTick(bindScrollListener)
+})
+
+onUnmounted(() => {
+  unbindScrollListener()
+})
+
 defineExpose({ reload: () => load(true) })
 </script>
 
 <template>
   <div class="home-recommend-list" :class="{ 'home-recommend-list--desktop': mdAndUp }">
-    <div class="home-recommend-list__scroll scroll-y-style">
+    <div ref="scrollRef" class="home-recommend-list__scroll scroll-y-style">
       <slot />
 
       <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-2" />
@@ -115,9 +218,21 @@ defineExpose({ reload: () => load(true) })
         </v-col>
       </v-row>
 
-      <div v-if="!loading && list.length > 0 && !notMore" class="py-3 text-center">
-        <v-btn variant="text" color="link" :loading="loadingMore" @click="load()"> 加载更多 </v-btn>
+      <v-progress-linear
+        v-if="loadingMore"
+        indeterminate
+        color="primary"
+        class="my-2"
+      />
+
+      <div
+        v-else-if="!loading && list.length > 0 && notMore"
+        class="text-center text-medium-emphasis text-caption py-4"
+      >
+        没有更多了
       </div>
+
+      <div class="home-recommend-list__scroll-tail" aria-hidden="true" />
     </div>
   </div>
 </template>
@@ -130,10 +245,16 @@ defineExpose({ reload: () => load(true) })
 
 .home-recommend-list--desktop {
   height: 100%;
+  min-height: 0;
 }
 
 .home-recommend-list--desktop .home-recommend-list__scroll {
   height: 100%;
+  min-height: 0;
   overflow-y: auto;
+}
+
+.home-recommend-list__scroll-tail {
+  height: 1px;
 }
 </style>
