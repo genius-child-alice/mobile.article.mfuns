@@ -1,0 +1,55 @@
+:root {
+  --mfuns-primary: #7b7ff7;
+  --mfuns-link: #7b7ff7;
+  --v-primary-base: var(--mfuns-primary);
+  --v-link-base: var(--mfuns-link);
+  --color-primary: var(--mfuns-primary);
+  --mfuns-app-bar-height: 48px;
+  --mfuns-bottom-nav-height: 0px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  overscroll-behavior-y: none;
+}
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.global-app {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.background {
+  background-color: #eef0f8;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.background-image {
+  background-color: #eef0f8;
+}
+
+/* sm–md landscape: inline tabs live in the app bar row (see AppShellLayout). */
+@media (min-width: 600px) and (max-width: 959px) {
+  .global-app {
+    --mfuns-shell-readable-width: 100%;
+  }
+}
+
+@media (min-width: 960px) {
+  .global-app {
+    --mfuns-shell-readable-width: 960px;
+  }
+}
+
+.v-application.global-app {
+  background: transparent !important;
+}
