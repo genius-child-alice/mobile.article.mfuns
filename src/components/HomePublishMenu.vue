@@ -12,7 +12,6 @@ const emit = defineEmits<{
 const router = useRouter()
 
 const items = [
-  { label: '视频', icon: 'mdi-upload', to: '/create/video' },
   { label: '文章', icon: 'mdi-text-long', to: '/create/article' },
   { label: '动态', icon: 'mdi-circle-edit-outline', to: '/create/feed' },
 ] as const
