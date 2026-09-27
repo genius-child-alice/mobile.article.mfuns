@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import type { Component } from 'vue'
 import AppShellLayout from '../layouts/AppShellLayout.vue'
 import RoutePlaceholder from '../views/RoutePlaceholder.vue'
+import SettingsThemesView from '../views/settings/SettingsThemesView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -8,17 +10,24 @@ import {
   pathToTitle,
 } from './staticRoutePaths'
 
+const routeComponents: Partial<Record<string, Component>> = {
+  '/settings/themes': SettingsThemesView,
+}
+
 const mainTabSet = new Set<string>(MAIN_TAB_PATHS)
+
+const shellFullBleedPaths = new Set(['/settings/themes'])
 
 const childRoutes = STATIC_PAGE_PATHS.map((path) => {
   const segment = path.replace(/^\//, '')
   return {
     path: segment,
     name: pathToRouteName(path),
-    component: RoutePlaceholder,
+    component: routeComponents[path] ?? RoutePlaceholder,
     meta: {
       title: pathToTitle(path),
       showBottomNav: mainTabSet.has(path),
+      shellFullBleed: shellFullBleedPaths.has(path),
     },
   }
 })

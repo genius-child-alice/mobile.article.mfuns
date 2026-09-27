@@ -81,7 +81,7 @@ export function pathToTitle(path: string): string {
     '/settings': '设置',
     '/settings/about': '关于',
     '/settings/security': '账号与安全',
-    '/settings/themes': '主题',
+    '/settings/themes': '主题设置',
     '/404': '404',
   }
   return titles[path] ?? path

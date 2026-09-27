@@ -43,8 +43,17 @@ const {
       :show-back-extension-tabs="showBackExtensionTabs"
     />
 
-    <v-main class="mfuns-main background-image" :class="{ 'mfuns-main--wide': mdAndUp }">
-      <div class="mfuns-main__inner">
+    <v-main
+      class="mfuns-main background-image"
+      :class="{
+        'mfuns-main--wide': mdAndUp && !route.meta.shellFullBleed,
+        'mfuns-main--full-bleed': route.meta.shellFullBleed,
+      }"
+    >
+      <div
+        class="mfuns-main__inner"
+        :class="{ 'mfuns-main__inner--full-bleed': route.meta.shellFullBleed }"
+      >
         <router-view />
       </div>
     </v-main>
@@ -88,5 +97,23 @@ const {
   max-width: 960px;
   margin-inline: auto;
   width: 100%;
+}
+
+.mfuns-main__inner--full-bleed {
+  max-width: none;
+  margin-inline: 0;
+  width: 100%;
+  padding-inline: 0;
+}
+
+.mfuns-main--wide .mfuns-main__inner--full-bleed {
+  max-width: none;
+  margin-inline: 0;
+  width: 100%;
+}
+
+.mfuns-main--full-bleed {
+  width: 100%;
+  max-width: none;
 }
 </style>
