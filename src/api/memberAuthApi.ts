@@ -1,4 +1,5 @@
-import { mfunsPost, type MfunsApiEnvelope } from './mfunsApi'
+import { mfunsGet, mfunsPost, type MfunsApiEnvelope } from './mfunsApi'
+import { readMemberAuthState } from '../auth/memberSession'
 
 export interface MemberLoginPayload {
   account: string
@@ -29,4 +30,9 @@ export function extractLoginToken(data: MemberLoginData | undefined): string | n
   if (!data) return null
   const token = data.token?.trim() || data.access_token?.trim()
   return token || null
+}
+
+export async function logoutMember(): Promise<MfunsApiEnvelope<unknown>> {
+  const { token } = readMemberAuthState()
+  return mfunsGet('/auth/logout', undefined, token)
 }

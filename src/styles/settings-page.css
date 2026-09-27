@@ -1,0 +1,61 @@
+.settings-page {
+  display: block;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  min-height: calc(
+    100vh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
+      env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+  );
+  min-height: calc(
+    100dvh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
+      env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+  );
+  background: rgb(var(--v-theme-surface));
+}
+
+.settings-list {
+  width: 100%;
+  max-width: none;
+  min-height: inherit;
+  padding-block: 8px;
+}
+
+.settings-list :deep(.v-list-item) {
+  min-height: 72px;
+  padding-inline: 16px;
+  padding-block: 0;
+  --v-list-prepend-gap: 16px;
+}
+
+.settings-list :deep(.v-list-item--two-line) {
+  min-height: 72px;
+}
+
+.settings-list :deep(.v-list-item__content) {
+  padding-block: 12px;
+}
+
+.settings-list :deep(.v-list-item__prepend) {
+  margin-inline-end: 0;
+}
+
+.settings-list :deep(.v-list-subheader) {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+  padding-inline: 16px;
+  min-height: 40px;
+}
+
+.settings-about-section {
+  padding: 16px 16px 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+}
+
+.settings-about-card {
+  margin-inline: 16px;
+  margin-bottom: 16px;
+}

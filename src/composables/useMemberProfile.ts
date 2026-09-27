@@ -23,7 +23,7 @@ function buildLevelCache(sections: { level_id: number; experience: number }[]): 
   return cache
 }
 
-function clearMemberProfile() {
+export function clearMemberProfile() {
   memberInfo.value = null
   history.value = []
   levelExpByLevelId.value = []

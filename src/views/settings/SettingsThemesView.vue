@@ -37,8 +37,8 @@ function select(index: number) {
 </script>
 
 <template>
-  <div class="settings-themes-page">
-    <v-list class="settings-themes-list" bg-color="surface" rounded="0">
+  <div class="settings-themes-page settings-page">
+    <v-list class="settings-themes-list settings-list" bg-color="surface" rounded="0">
       <v-radio-group v-model="current" hide-details class="settings-themes-list__group">
         <v-list-item v-for="(preset, index) in presets" :key="index" @click="select(index)">
           <template #prepend>
@@ -67,21 +67,7 @@ function select(index: number) {
 </template>
 
 <style scoped>
-.settings-themes-page {
-  display: block;
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
-  min-height: calc(
-    100vh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
-      env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
-  );
-  min-height: calc(
-    100dvh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
-      env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
-  );
-  background: rgb(var(--v-theme-surface));
-}
+@import '../../styles/settings-page.css';
 
 .settings-themes-list {
   width: 100%;

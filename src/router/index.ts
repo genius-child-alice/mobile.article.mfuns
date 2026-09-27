@@ -3,6 +3,9 @@ import type { Component } from 'vue'
 import AppShellLayout from '../layouts/AppShellLayout.vue'
 import RoutePlaceholder from '../views/RoutePlaceholder.vue'
 import SettingsThemesView from '../views/settings/SettingsThemesView.vue'
+import SettingsView from '../views/settings/SettingsView.vue'
+import SettingsAboutView from '../views/settings/SettingsAboutView.vue'
+import SettingsSecurityView from '../views/settings/SettingsSecurityView.vue'
 import MemberView from '../views/member/MemberView.vue'
 import MemberLoginView from '../views/member/MemberLoginView.vue'
 import {
@@ -15,12 +18,21 @@ import {
 const routeComponents: Partial<Record<string, Component>> = {
   '/member': MemberView,
   '/member/login': MemberLoginView,
+  '/settings': SettingsView,
+  '/settings/about': SettingsAboutView,
+  '/settings/security': SettingsSecurityView,
   '/settings/themes': SettingsThemesView,
 }
 
 const mainTabSet = new Set<string>(MAIN_TAB_PATHS)
 
-const shellFullBleedPaths = new Set(['/member', '/settings/themes'])
+const shellFullBleedPaths = new Set([
+  '/member',
+  '/settings',
+  '/settings/about',
+  '/settings/security',
+  '/settings/themes',
+])
 
 /** Login/register: full main width like reference LoginPage (not 960px column). */
 const shellStretchMainPaths = new Set([
