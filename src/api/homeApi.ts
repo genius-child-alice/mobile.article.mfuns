@@ -33,6 +33,9 @@ export interface HomeCategory {
   name?: string
 }
 
+/** 首页列表统一筛文章（type=0） */
+const HOME_LIST_TYPE = 0
+
 export function fetchRecommend(
   categoryId: number,
   size: number,
@@ -40,6 +43,7 @@ export function fetchRecommend(
   return mfunsGet<HomeRecommendData>('/recommend/get', {
     category: categoryId,
     size,
+    type: HOME_LIST_TYPE,
   })
 }
 
@@ -52,6 +56,7 @@ export function fetchCategoryFeed(
     cid: categoryId,
     page,
     size,
+    type: HOME_LIST_TYPE,
   })
 }
 
@@ -60,7 +65,9 @@ export function fetchAllCategories(): Promise<MfunsApiEnvelope<HomeCategory[]>> 
 }
 
 export function fetchLeaderboardHot(): Promise<MfunsApiEnvelope<HomeContentItem[]>> {
-  return mfunsGet<HomeContentItem[]>('/leaderboards/hot')
+  return mfunsGet<HomeContentItem[]>('/leaderboards/hot', {
+    type: HOME_LIST_TYPE,
+  })
 }
 
 export function homeContentPath(item: HomeContentItem): string {
