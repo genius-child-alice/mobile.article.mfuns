@@ -36,7 +36,8 @@ function pick(id: number) {
       v-for="item in items"
       :key="item.id"
       v-ripple
-      class="pa-3 d-flex align-center justify-center mb-3"
+      class="home-category-select__btn pa-3 d-flex align-center justify-center mb-3"
+      :class="{ 'home-category-select__btn--selected': modelValue === item.id }"
       rounded
       :variant="modelValue === item.id ? 'flat' : 'outlined'"
       :color="modelValue === item.id ? 'primary' : undefined"
@@ -58,6 +59,8 @@ function pick(id: number) {
       v-for="item in items"
       :key="item.id"
       :value="item.id"
+      class="home-category-select__btn"
+      :class="{ 'home-category-select__btn--selected': modelValue === item.id }"
       rounded
       :variant="modelValue === item.id ? 'flat' : 'outlined'"
       :color="modelValue === item.id ? 'primary' : undefined"
@@ -69,13 +72,23 @@ function pick(id: number) {
 </template>
 
 <style scoped>
+/* 与 MainNavSideRail `.mfuns-side-rail` 右边框一致 */
+.home-category-select {
+  --home-category-border-color: rgba(var(--v-theme-on-surface), 0.12);
+}
+
 .home-category-select--sidebar {
   width: 200px;
   flex-shrink: 0;
   height: 100%;
+  border-inline-end: 1px solid var(--home-category-border-color);
 }
 
-/* 与内容网格 padding: 4px 左缘对齐 */
+.home-category-select--sidebar :deep(.home-category-select__btn:not(.home-category-select__btn--selected)) {
+  border: 1px solid var(--home-category-border-color) !important;
+  border-width: 1px !important;
+}
+
 .home-category-select--chips {
   overflow-x: auto;
   white-space: nowrap;
@@ -90,5 +103,12 @@ function pick(id: number) {
 
 .home-category-select--chips :deep(.v-slide-group__content) {
   padding-inline: 0;
+}
+
+.home-category-select--chips :deep(.home-category-select__btn:not(.home-category-select__btn--selected).v-chip) {
+  --v-border-opacity: 1;
+  border: 1px solid var(--home-category-border-color) !important;
+  border-width: 1px !important;
+  box-shadow: none !important;
 }
 </style>
