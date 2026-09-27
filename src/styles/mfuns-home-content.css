@@ -1,7 +1,10 @@
-/* m.mfuns ContentCard / 1fdd2dd.css */
+/* m.mfuns ContentCard / 1fdd2dd.css — 不用 content-visibility / contain-intrinsic-size，避免锁死最小宽度 */
 .content-block {
-  contain-intrinsic-size: 192px;
-  content-visibility: auto;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .card-title {
@@ -13,6 +16,8 @@
   height: 2.65em;
   line-height: 1.25;
   color: rgb(var(--v-theme-on-surface));
+  min-width: 0;
+  max-width: 100%;
 }
 
 .tag-info {

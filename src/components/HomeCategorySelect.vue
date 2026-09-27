@@ -54,7 +54,6 @@ function pick(id: number) {
     mandatory
     @update:model-value="pick($event as number)"
   >
-    <div class="home-category-select__chip-lead" aria-hidden="true" />
     <v-chip
       v-for="item in items"
       :key="item.id"
@@ -76,18 +75,20 @@ function pick(id: number) {
   height: 100%;
 }
 
+/* 与内容网格 padding: 4px 左缘对齐 */
 .home-category-select--chips {
   overflow-x: auto;
   white-space: nowrap;
   scrollbar-width: none;
+  padding-inline: 4px;
+  box-sizing: border-box;
 }
 
 .home-category-select--chips::-webkit-scrollbar {
   display: none;
 }
 
-.home-category-select__chip-lead {
-  width: 8px;
-  flex-shrink: 0;
+.home-category-select--chips :deep(.v-slide-group__content) {
+  padding-inline: 0;
 }
 </style>

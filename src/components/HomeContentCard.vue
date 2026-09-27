@@ -33,7 +33,7 @@ const showDuration = computed(
 
 <template>
   <v-card
-    class="content-block overflow-hidden rounded"
+    class="content-block home-content-card overflow-hidden rounded w-100"
     elevation="0"
     color="rgba(0,0,0,0)"
     ripple
@@ -60,37 +60,73 @@ const showDuration = computed(
         <span v-if="showDuration" class="ml-1 mr-2">{{ formatDuration(data.duration!) }}</span>
       </div>
     </div>
-    <div class="py-2 px-0 d-flex flex-fill">
-      <div class="flex-fill d-flex flex-column" style="height: 100%">
-        <div class="card-title">
-          {{ data.title }}
-        </div>
-        <div class="d-flex align-center mt-1 text-disabled">
-          <v-avatar size="24" class="flex-shrink-0">
-            <v-img v-if="avatarSrc" :src="avatarSrc" cover />
-            <v-icon v-else icon="mdi-account" size="16" />
-          </v-avatar>
-          <span
-            v-if="data.user?.name"
-            class="text-truncate ml-1"
-            :class="data.user.name_color ? `${data.user.name_color}--text` : undefined"
-            style="font-size: 14px"
-          >
-            {{ data.user.name }}
-          </span>
-        </div>
+    <div class="home-content-card__body py-2 px-0">
+      <div class="card-title">
+        {{ data.title }}
+      </div>
+      <div class="home-content-card__author d-flex align-center mt-1 text-disabled min-width-0">
+        <v-avatar size="24" class="flex-shrink-0">
+          <v-img v-if="avatarSrc" :src="avatarSrc" cover />
+          <v-icon v-else icon="mdi-account" size="16" />
+        </v-avatar>
+        <span
+          v-if="data.user?.name"
+          class="text-truncate ml-1 min-width-0"
+          :class="data.user.name_color ? `${data.user.name_color}--text` : undefined"
+          style="font-size: 14px"
+        >
+          {{ data.user.name }}
+        </span>
       </div>
     </div>
   </v-card>
 </template>
 
 <style scoped>
+.home-content-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .home-content-card__cover {
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
   background: #f9f9f9;
 }
 
+.home-content-card__cover :deep(.v-img),
+.home-content-card__cover :deep(.v-responsive),
+.home-content-card__cover :deep(img) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
 .home-content-card__cover-placeholder {
+  width: 100%;
   aspect-ratio: 16 / 9;
+}
+
+.home-content-card__body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.home-content-card__author {
+  width: 100%;
+}
+
+.home-content-card .card-title,
+.home-content-card .text-truncate {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 </style>

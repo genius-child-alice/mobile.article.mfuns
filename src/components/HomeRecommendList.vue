@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import HomeContentCard from './HomeContentCard.vue'
@@ -14,12 +14,23 @@ const SCROLL_THRESHOLD_PX = 160
 
 const props = defineProps<{
   categoryId: number
+  /** 左侧分区 + 中间列表 + 右侧热门同时展示 */
+  threeColumn?: boolean
 }>()
 
 const router = useRouter()
 const { mdAndUp } = useDisplay()
 
 const scrollRef = ref<HTMLElement | null>(null)
+const isPortrait = ref(true)
+
+/** CSS Grid 列数：三栏→3；竖屏→2；其余按宽度递进 */
+const gridColumnCount = computed(() => {
+  if (props.threeColumn) return 3
+  if (isPortrait.value) return 2
+  if (typeof window !== 'undefined' && window.innerWidth >= 1920) return 4
+  return 3
+})
 
 const list = ref<HomeContentItem[]>([])
 const page = ref(1)
@@ -28,6 +39,10 @@ const loadingMore = ref(false)
 const notMore = ref(false)
 
 let scrollTarget: HTMLElement | Window | null = null
+
+function syncPortrait() {
+  isPortrait.value = window.matchMedia('(orientation: portrait)').matches
+}
 
 function pageSize(): number {
   return mdAndUp.value ? 14 : 10
@@ -183,11 +198,16 @@ watch(mdAndUp, () => {
 })
 
 onMounted(() => {
+  syncPortrait()
+  window.addEventListener('resize', syncPortrait, { passive: true })
+  window.matchMedia('(orientation: portrait)').addEventListener('change', syncPortrait)
   nextTick(bindScrollListener)
 })
 
 onUnmounted(() => {
   unbindScrollListener()
+  window.removeEventListener('resize', syncPortrait)
+  window.matchMedia('(orientation: portrait)').removeEventListener('change', syncPortrait)
 })
 
 defineExpose({ reload: () => load(true) })
@@ -204,19 +224,18 @@ defineExpose({ reload: () => load(true) })
         暂无内容
       </div>
 
-      <v-row v-else dense class="ma-1">
-        <v-col
+      <div
+        v-else
+        class="home-recommend-list__grid"
+        :style="{ '--home-grid-cols': String(gridColumnCount) }"
+      >
+        <HomeContentCard
           v-for="(item, index) in list"
           :key="`${item.id}-${index}`"
-          cols="6"
-          sm="4"
-          md="4"
-          lg="4"
-          xl="3"
-        >
-          <HomeContentCard :data="item" @click="openItem(item)" />
-        </v-col>
-      </v-row>
+          :data="item"
+          @click="openItem(item)"
+        />
+      </div>
 
       <v-progress-linear
         v-if="loadingMore"
@@ -239,8 +258,18 @@ defineExpose({ reload: () => load(true) })
 
 <style scoped>
 .home-recommend-list {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   position: relative;
+  overflow: hidden;
+}
+
+.home-recommend-list__scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .home-recommend-list--desktop {
@@ -251,7 +280,25 @@ defineExpose({ reload: () => load(true) })
 .home-recommend-list--desktop .home-recommend-list__scroll {
   height: 100%;
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
+}
+
+.home-recommend-list__grid {
+  display: grid;
+  /* minmax(0, 1fr) 才能随容器变窄，避免被图片/文字撑开 */
+  grid-template-columns: repeat(var(--home-grid-cols, 2), minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 4px;
+}
+
+.home-recommend-list__grid > :deep(*) {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .home-recommend-list__scroll-tail {

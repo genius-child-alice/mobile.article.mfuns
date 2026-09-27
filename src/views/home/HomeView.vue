@@ -18,6 +18,11 @@ const showCategorySidebar = computed(
   () => lgAndUp.value || (mdAndUp.value && isLandscape.value),
 )
 
+/** 分区侧栏 + 内容 + 热门榜同时出现（三栏首页） */
+const isHomeThreeColumn = computed(
+  () => mdAndUp.value && showCategorySidebar.value,
+)
+
 function syncLandscape() {
   isLandscape.value = window.matchMedia('(orientation: landscape)').matches
 }
@@ -56,6 +61,7 @@ onUnmounted(() => {
               <HomeRecommendList
                 class="home-page__feed"
                 :category-id="categoryId"
+                :three-column="isHomeThreeColumn"
               >
                 <HomeCategorySelect
                   v-if="!showCategorySidebar"
@@ -132,26 +138,42 @@ onUnmounted(() => {
 }
 
 .home-page__recommend {
+  width: 100%;
+  max-width: 100%;
   height: 100%;
   max-height: 100%;
+  min-width: 0;
   min-height: 0;
 }
 
 .home-page__window :deep(.v-window__container) {
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .home-page__window :deep(.v-window-item) {
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .home-page__recommend-main {
+  width: 100%;
+  max-width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .home-page__feed {
+  width: 100%;
+  max-width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
 }
 
