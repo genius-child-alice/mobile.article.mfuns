@@ -63,7 +63,7 @@ function goLoginRequired(to: string) {
       <!-- 已登录 -->
       <div v-else class="member-panel">
         <div
-          class="member-profile-entry d-flex align-center px-4 pb-2"
+          class="member-profile-entry d-flex align-center px-4 py-2"
         role="button"
         tabindex="0"
         @click="go('/member/profile')"
@@ -210,7 +210,6 @@ function goLoginRequired(to: string) {
 
 .member-profile-entry {
   cursor: pointer;
-  padding-top: 0;
 }
 
 .member-profile-entry:focus-visible {
