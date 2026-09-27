@@ -6,6 +6,7 @@ import { MEMBER_SERVICE_ITEMS } from '../../constants/memberServices'
 import { useMemberAuth } from '../../composables/useMemberAuth'
 import { useMemberProfile } from '../../composables/useMemberProfile'
 import { mfunsImageUrl } from '../../utils/mfunsImageUrl'
+import MfunsBadge from '../../components/MfunsBadge.vue'
 
 const router = useRouter()
 const { xs } = useDisplay()
@@ -19,6 +20,8 @@ const {
   followCount,
   memberId,
   profileSubtitle,
+  displayBadgeIds,
+  memberNameColorClass,
   refreshMemberProfile,
 } = useMemberProfile()
 
@@ -94,8 +97,19 @@ function historyCover(item: (typeof history.value)[number]): string {
           <v-icon v-else icon="mdi-account" size="32" />
         </v-avatar>
         <div class="flex-grow-1 min-width-0">
-          <div class="text-subtitle-1 font-weight-medium text-truncate">
-            {{ memberInfo?.name || '个人资料' }}
+          <div class="member-profile-entry__title d-flex align-center flex-wrap">
+            <span
+              class="text-subtitle-1 font-weight-medium text-truncate"
+              :class="memberNameColorClass"
+            >
+              {{ memberInfo?.name || '个人资料' }}
+            </span>
+            <span
+              v-if="displayBadgeIds.length"
+              class="member-profile-entry__badges d-inline-flex align-center"
+            >
+              <MfunsBadge v-for="badgeId in displayBadgeIds" :key="badgeId" :id="badgeId" />
+            </span>
           </div>
           <div class="text-caption text-medium-emphasis text-truncate">
             {{ profileSubtitle }}
@@ -263,6 +277,20 @@ function historyCover(item: (typeof history.value)[number]): string {
 
 .member-profile-entry {
   cursor: pointer;
+}
+
+.member-profile-entry__title {
+  row-gap: 2px;
+}
+
+.member-profile-entry__badges {
+  margin-inline-start: 8px;
+  column-gap: 2px;
+}
+
+.member-profile-entry__title .text-truncate {
+  max-width: 100%;
+  flex: 0 1 auto;
 }
 
 .member-profile-entry:focus-visible {

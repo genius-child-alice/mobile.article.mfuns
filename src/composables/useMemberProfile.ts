@@ -7,6 +7,7 @@ import {
   type MemberUserInfo,
 } from '../api/memberUserApi'
 import { readMemberAuthState } from '../auth/memberSession'
+import { clearBadgeCache } from '../utils/memberBadgeCache'
 
 const memberInfo = ref<MemberUserInfo | null>(null)
 const history = ref<MemberHistoryItem[]>([])
@@ -27,6 +28,7 @@ export function clearMemberProfile() {
   memberInfo.value = null
   history.value = []
   levelExpByLevelId.value = []
+  clearBadgeCache()
 }
 
 export async function refreshMemberProfile(): Promise<void> {
@@ -90,6 +92,23 @@ export function useMemberProfile() {
     return `UID: ${user.id} EXP: ${exp}/${expCap}`
   })
 
+  /** Level badge first, then worn badges (m.mfuns CurrentMember). */
+  const displayBadgeIds = computed(() => {
+    const user = memberInfo.value
+    if (!user) return []
+    const ids: number[] = []
+    if (user.level_id) ids.push(user.level_id)
+    if (user.badges?.length) ids.push(...user.badges)
+    return ids
+  })
+
+  const memberNameColorClass = computed(() => {
+    const color = memberInfo.value?.name_color?.trim()
+    if (!color) return undefined
+    if (color.includes('--text')) return color
+    return `${color}--text`
+  })
+
   return {
     memberInfo: shallowReadonly(memberInfo),
     history: shallowReadonly(history),
@@ -99,6 +118,8 @@ export function useMemberProfile() {
     followCount,
     memberId,
     profileSubtitle,
+    displayBadgeIds,
+    memberNameColorClass,
     refreshMemberProfile,
     clearMemberProfile,
   }

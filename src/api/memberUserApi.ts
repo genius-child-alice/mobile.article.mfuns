@@ -15,6 +15,8 @@ export interface MemberUserInfo {
   level_id?: number
   bio?: string
   follow?: MemberFollowStats
+  /** Worn badge ids (reference: member_auth.wearBadges). */
+  badges?: number[]
 }
 
 export interface MemberUserInfoData {
