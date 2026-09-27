@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import HomePublishMenu from './HomePublishMenu.vue'
+import { useMemberAuth } from '../composables/useMemberAuth'
 import type { MfunsAppBarConfig } from '../router/resolveAppBar'
 
 const props = defineProps<{
@@ -16,6 +17,7 @@ const props = defineProps<{
 const route = useRoute()
 const router = useRouter()
 const { mobile } = useDisplay()
+const { isLoggedIn } = useMemberAuth()
 
 const homeTabIndex = ref(0)
 const timelineTabIndex = ref(0)
@@ -72,7 +74,14 @@ function goBack() {
         <v-btn icon variant="text" color="white" :to="{ path: '/search' }" aria-label="搜索">
           <v-icon icon="mdi-magnify" />
         </v-btn>
-        <v-btn icon variant="text" color="white" :to="{ path: '/message' }" aria-label="私信">
+        <v-btn
+          v-show="isLoggedIn"
+          icon
+          variant="text"
+          color="white"
+          :to="{ path: '/message' }"
+          aria-label="私信"
+        >
           <v-badge
             :model-value="notifyCount > 0"
             :content="notifyCount"
@@ -82,24 +91,26 @@ function goBack() {
             <v-icon icon="mdi-email" />
           </v-badge>
         </v-btn>
-        <v-btn
-          v-if="mobile"
-          icon
-          variant="text"
-          color="white"
-          aria-label="发布作品"
-          @click="createDialogOpen = true"
-        >
-          <v-icon icon="mdi-plus-circle" />
-        </v-btn>
-        <v-menu v-else v-model="createMenuOpen" location="bottom end" :close-on-content-click="false">
-          <template #activator="{ props: menuProps }">
-            <v-btn v-bind="menuProps" icon variant="text" color="white" aria-label="发布作品">
-              <v-icon icon="mdi-plus-circle" />
-            </v-btn>
-          </template>
-          <HomePublishMenu v-model="createMenuOpen" />
-        </v-menu>
+        <template v-if="isLoggedIn">
+          <v-btn
+            v-if="mobile"
+            icon
+            variant="text"
+            color="white"
+            aria-label="发布作品"
+            @click="createDialogOpen = true"
+          >
+            <v-icon icon="mdi-plus-circle" />
+          </v-btn>
+          <v-menu v-else v-model="createMenuOpen" location="bottom end" :close-on-content-click="false">
+            <template #activator="{ props: menuProps }">
+              <v-btn v-bind="menuProps" icon variant="text" color="white" aria-label="发布作品">
+                <v-icon icon="mdi-plus-circle" />
+              </v-btn>
+            </template>
+            <HomePublishMenu v-model="createMenuOpen" />
+          </v-menu>
+        </template>
       </div>
 
       <!-- timeline（参考站：v-tabs-slider 白色下划线，非 hide-slider） -->
