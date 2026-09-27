@@ -22,11 +22,6 @@ function syncLandscape() {
   isLandscape.value = window.matchMedia('(orientation: landscape)').matches
 }
 
-const desktopRecommendHeight = computed(() => {
-  if (!mdAndUp.value) return undefined
-  return `calc(100dvh - var(--mfuns-app-bar-height, 48px))`
-})
-
 onMounted(() => {
   syncLandscape()
   window.addEventListener('resize', syncLandscape, { passive: true })
@@ -46,16 +41,11 @@ onUnmounted(() => {
       class="home-page__container pt-0 pt-sm-1"
       :class="{ 'pa-0': xs }"
     >
-      <v-window
-        v-model="tabIndex"
-        class="home-page__window"
-        :style="desktopRecommendHeight ? { height: desktopRecommendHeight } : undefined"
-      >
+      <v-window v-model="tabIndex" class="home-page__window">
         <v-window-item :value="0">
           <div
             class="home-page__recommend d-flex overflow-hidden min-height-0"
             :class="{ 'home-page__recommend--with-sidebar': showCategorySidebar }"
-            :style="desktopRecommendHeight ? { height: desktopRecommendHeight } : undefined"
           >
             <HomeCategorySelect
               v-if="showCategorySidebar"
@@ -98,17 +88,33 @@ onUnmounted(() => {
 
 <style scoped>
 .home-page {
-  width: 100%;
-  min-height: calc(
+  --home-fill-height: calc(
     100dvh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
       env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: var(--home-fill-height);
+  max-height: var(--home-fill-height);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .home-page__container {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   max-width: 1400px;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
   margin-inline: auto;
   overflow: hidden;
+  padding-bottom: 0 !important;
 }
 
 @media (min-width: 600px) {
@@ -119,6 +125,16 @@ onUnmounted(() => {
 
 .home-page__window {
   background: transparent;
+  flex: 1 1 auto;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.home-page__recommend {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
 }
 
 .home-page__window :deep(.v-window__container) {
