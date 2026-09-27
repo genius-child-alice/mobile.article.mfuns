@@ -82,3 +82,35 @@ export async function mfunsGet<T = unknown>(
 
   return parseEnvelope<T>(res)
 }
+
+/** multipart 上传（可选进度，对齐参考站 axios onUploadProgress） */
+export function mfunsPostForm<T = unknown>(
+  path: string,
+  form: FormData,
+  token?: string | null,
+  onProgress?: (ratio: number) => void,
+): Promise<MfunsApiEnvelope<T>> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', joinUrl(path))
+    const headers = buildJsonHeaders(token) as Record<string, string>
+    for (const [key, value] of Object.entries(headers)) {
+      xhr.setRequestHeader(key, value)
+    }
+    xhr.responseType = 'json'
+    xhr.upload.onprogress = (ev) => {
+      if (!onProgress || !ev.lengthComputable || ev.total <= 0) return
+      onProgress(ev.loaded / ev.total)
+    }
+    xhr.onload = () => {
+      const body = xhr.response as MfunsApiEnvelope<T> | null
+      if (body && typeof body === 'object') {
+        resolve(body)
+        return
+      }
+      reject(new MfunsApiError(0, '响应解析失败'))
+    }
+    xhr.onerror = () => reject(new MfunsApiError(0, '网络错误'))
+    xhr.send(form)
+  })
+}

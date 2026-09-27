@@ -2,11 +2,13 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
+  updateMemberAvatar,
   updateMemberBio,
   updateMemberGender,
   updateMemberName,
 } from '../../api/memberUserApi'
 import { readMemberAuthState } from '../../auth/memberSession'
+import MediaLibrary from '../../components/MediaLibrary.vue'
 import MfunsBadge from '../../components/MfunsBadge.vue'
 import { useMemberAuth } from '../../composables/useMemberAuth'
 import { useMemberProfile } from '../../composables/useMemberProfile'
@@ -16,6 +18,7 @@ import { formatUnixDatetime } from '../../utils/mfunsTime'
 const router = useRouter()
 const { isLoggedIn } = useMemberAuth()
 const { memberInfo, loading, refreshMemberProfile } = useMemberProfile()
+const mediaLibrary = ref<InstanceType<typeof MediaLibrary> | null>(null)
 
 const nameDialog = ref(false)
 const genderDialog = ref(false)
@@ -171,8 +174,26 @@ async function saveBio() {
   }
 }
 
-function goMedia() {
-  router.push('/media')
+function openAvatarLibrary() {
+  mediaLibrary.value?.open('select', 1)
+}
+
+async function onAvatarSelected(filePath: string) {
+  const token = requireToken()
+  if (!token || !filePath) return
+
+  saving.value = true
+  try {
+    const res = await updateMemberAvatar(token, filePath)
+    if (res.code === 1) {
+      toast(res.msg || '头像已更新')
+      await refreshMemberProfile()
+    } else {
+      toast(res.msg || '头像更新失败', 'error')
+    }
+  } finally {
+    saving.value = false
+  }
 }
 
 function goBadges() {
@@ -204,7 +225,7 @@ onMounted(async () => {
       <!-- inset + 空 avatar 占位：与参考站一致，分组标题与选项标题左缘对齐 -->
       <v-list-subheader inset>头像和徽章</v-list-subheader>
 
-      <v-list-item lines="two" ripple @click="goMedia">
+      <v-list-item lines="two" ripple @click="openAvatarLibrary">
         <template #prepend>
           <v-avatar size="40" class="member-profile-list__avatar">
             <v-img v-if="avatarSrc" :src="avatarSrc" cover />
@@ -371,6 +392,8 @@ onMounted(async () => {
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <MediaLibrary ref="mediaLibrary" title="选择头像" @select="onAvatarSelected" />
 
     <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="2500">
       {{ snackbarText }}
