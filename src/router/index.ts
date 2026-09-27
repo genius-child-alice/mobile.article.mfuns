@@ -9,6 +9,7 @@ import SettingsSecurityView from '../views/settings/SettingsSecurityView.vue'
 import MemberView from '../views/member/MemberView.vue'
 import MemberLoginView from '../views/member/MemberLoginView.vue'
 import MemberHistoryView from '../views/member/MemberHistoryView.vue'
+import MemberProfileView from '../views/member/MemberProfileView.vue'
 import TimelineView from '../views/timeline/TimelineView.vue'
 import HomeView from '../views/home/HomeView.vue'
 import {
@@ -23,6 +24,7 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/timeline': TimelineView,
   '/member': MemberView,
   '/member/login': MemberLoginView,
+  '/member/profile': MemberProfileView,
   '/member/history': MemberHistoryView,
   '/settings': SettingsView,
   '/settings/about': SettingsAboutView,
@@ -35,6 +37,7 @@ const mainTabSet = new Set<string>(MAIN_TAB_PATHS)
 const shellFullBleedPaths = new Set([
   '/member',
   '/member/history',
+  '/member/profile',
   '/settings',
   '/settings/about',
   '/settings/security',
