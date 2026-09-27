@@ -42,9 +42,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+/* 与 MainNavSideRail `.mfuns-side-rail` 右边框一致 */
 .home-category-panel__cell {
+  --home-category-border-color: rgba(var(--v-theme-on-surface), 0.12);
   cursor: pointer;
   min-height: 56px;
   background: rgb(var(--v-theme-surface));
+  border: 1px solid var(--home-category-border-color) !important;
+  border-width: 1px !important;
 }
 </style>
