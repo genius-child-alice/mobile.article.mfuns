@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ArticleContentBar from '../../components/ArticleContentBar.vue'
 import {
@@ -9,6 +9,7 @@ import {
 } from '../../api/memberUserApi'
 import { readMemberAuthState } from '../../auth/memberSession'
 import { useMemberAuth } from '../../composables/useMemberAuth'
+import { registerMemberHistoryClearedHandler } from '../../composables/useMemberHistoryClear'
 
 const router = useRouter()
 const { isLoggedIn } = useMemberAuth()
@@ -79,8 +80,17 @@ function openItem(item: MemberHistoryItem) {
   router.push(`/article/${id}`)
 }
 
+let unregisterHistoryClear: (() => void) | undefined
+
 onMounted(() => {
   void loadHistory(true)
+  unregisterHistoryClear = registerMemberHistoryClearedHandler(() => {
+    void loadHistory(true)
+  })
+})
+
+onUnmounted(() => {
+  unregisterHistoryClear?.()
 })
 </script>
 

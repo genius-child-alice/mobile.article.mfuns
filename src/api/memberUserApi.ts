@@ -70,6 +70,10 @@ export function fetchMemberHistory(
   return mfunsGet<MemberHistoryItem[]>('/history/get', params, token)
 }
 
+export function clearMemberHistory(token: string): Promise<MfunsApiEnvelope<unknown>> {
+  return mfunsGet('/history/clean', undefined, token)
+}
+
 export function fetchMemberLevelSection(
   token: string,
 ): Promise<MfunsApiEnvelope<MemberLevelSection[]>> {

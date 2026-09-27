@@ -4,6 +4,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import HomePublishMenu from './HomePublishMenu.vue'
 import { useMemberAuth } from '../composables/useMemberAuth'
+import {
+  openMemberHistoryClearDialog,
+  useMemberHistoryClearDialog,
+  notifyMemberHistoryCleared,
+} from '../composables/useMemberHistoryClear'
+import { clearMemberHistory } from '../api/memberUserApi'
+import { refreshMemberProfile } from '../composables/useMemberProfile'
+import { readMemberAuthState } from '../auth/memberSession'
 import type { MfunsAppBarConfig } from '../router/resolveAppBar'
 
 const props = defineProps<{
@@ -28,6 +36,8 @@ const createMenuOpen = ref(false)
 
 /** Placeholder until notify API is wired. */
 const notifyCount = ref(0)
+const historyClearDialog = useMemberHistoryClearDialog()
+const historyClearLoading = ref(false)
 
 const pageTitle = computed(() => {
   if (props.config.variant !== 'back') return ''
@@ -39,6 +49,21 @@ const pageTitle = computed(() => {
 function goBack() {
   if (window.history.length > 1) router.back()
   else router.push('/home')
+}
+
+async function confirmClearHistory() {
+  historyClearLoading.value = true
+  try {
+    const { token } = readMemberAuthState()
+    if (token) {
+      await clearMemberHistory(token)
+    }
+    historyClearDialog.value = false
+    notifyMemberHistoryCleared()
+    void refreshMemberProfile()
+  } finally {
+    historyClearLoading.value = false
+  }
 }
 </script>
 
@@ -185,6 +210,16 @@ function goBack() {
         <v-btn v-else-if="config.trailing === 'playlist-new'" icon variant="text" color="white" aria-label="新建">
           <v-icon icon="mdi-plus" />
         </v-btn>
+        <v-btn
+          v-else-if="config.trailing === 'history-clear'"
+          icon
+          variant="text"
+          color="white"
+          aria-label="清空历史记录"
+          @click="openMemberHistoryClearDialog()"
+        >
+          <v-icon icon="mdi-delete-outline" />
+        </v-btn>
       </template>
     </template>
 
@@ -218,6 +253,22 @@ function goBack() {
 
   <v-dialog v-model="createDialogOpen" class="mfuns-publish-dialog" max-width="350">
     <HomePublishMenu v-model="createDialogOpen" />
+  </v-dialog>
+
+  <v-dialog v-model="historyClearDialog" max-width="320">
+    <v-card>
+      <v-card-title class="text-h6">清空历史记录</v-card-title>
+      <v-card-text>是否清空历史记录？</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn variant="text" :disabled="historyClearLoading" @click="historyClearDialog = false">
+          取消
+        </v-btn>
+        <v-btn color="primary" variant="text" :loading="historyClearLoading" @click="confirmClearHistory">
+          确定
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
 </template>
 
