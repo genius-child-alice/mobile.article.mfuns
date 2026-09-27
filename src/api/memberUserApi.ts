@@ -51,8 +51,14 @@ export function fetchMemberUserInfo(
 export function fetchMemberHistory(
   token: string,
   startTime = 0,
+  /** 0 = 文章（参考 m.mfuns ArticleHistory / history.get） */
+  resourceType?: number,
 ): Promise<MfunsApiEnvelope<MemberHistoryItem[]>> {
-  return mfunsGet<MemberHistoryItem[]>('/history/get', { start_time: startTime }, token)
+  const params: Record<string, string | number | undefined> = { start_time: startTime }
+  if (resourceType !== undefined) {
+    params.resource_type = resourceType
+  }
+  return mfunsGet<MemberHistoryItem[]>('/history/get', params, token)
 }
 
 export function fetchMemberLevelSection(

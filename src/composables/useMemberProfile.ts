@@ -45,7 +45,7 @@ export async function refreshMemberProfile(): Promise<void> {
     try {
       const [infoRes, historyRes, levelRes] = await Promise.all([
         fetchMemberUserInfo(token),
-        fetchMemberHistory(token, 0),
+        fetchMemberHistory(token, 0, 0),
         fetchMemberLevelSection(token),
       ])
 
