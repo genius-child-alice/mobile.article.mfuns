@@ -6,6 +6,9 @@
   --color-primary: var(--mfuns-primary);
   --mfuns-app-bar-height: 48px;
   --mfuns-bottom-nav-height: 0px;
+  /* m.mfuns layout 8f8c6a8.css — light main area grid tile */
+  --mfuns-light-grid-tile: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAhCAYAAABX5MJvAAAAAXNSR0IArs4c6QAAAJlJREFUWIXFl7EOgCAMRPn/P3Vk0MRJJx00pIX2+pjJ3SNAe20tuI6tX1GNFAAM5GtcDjIyLAOxjOQgfT9dBt59MgAZyKpgGkhUKAySdZJlnew7ndZTvW63rvqfm/pVFW/oU137f35UF3x96TyAg+BXgj9O/Ju69fGKqQLBmxjezvFgg0c8POzKAJ6Fzx2WET4K4kMxHQdSAG4VLfVl9GxszgAAAABJRU5ErkJggg==);
+  --mfuns-light-pattern-base: #f8f9fb;
 }
 
 html {
@@ -24,7 +27,7 @@ html.mfuns-theme-dark body {
 
 html.mfuns-theme-light,
 html.mfuns-theme-light body {
-  background-color: #eef0f8;
+  background-color: var(--mfuns-light-pattern-base);
 }
 
 #app {
@@ -44,7 +47,19 @@ html.mfuns-theme-light body {
 }
 
 .background-image {
+  min-height: 100%;
+}
+
+html.mfuns-theme-light .background-image {
+  background-color: var(--mfuns-light-pattern-base);
+  background-image: var(--mfuns-light-grid-tile);
+  background-repeat: repeat;
+  background-size: 32px 32px;
+}
+
+html.mfuns-theme-dark .background-image {
   background-color: rgb(var(--v-theme-background));
+  background-image: none;
 }
 
 /* sm–md landscape: inline tabs live in the app bar row (see AppShellLayout). */

@@ -30,7 +30,7 @@ export const vuetify = createVuetify({
           ...sharedColors,
           primary: '#7b7ff7',
           link: '#7b7ff7',
-          background: '#eef0f8',
+          background: '#f8f9fb',
           surface: '#ffffff',
         },
       },
