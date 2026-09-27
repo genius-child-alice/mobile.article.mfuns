@@ -63,7 +63,6 @@ function goBack() {
           align-tabs="center"
           class="mfuns-home-tabs mfuns-home-tabs--inline flex-shrink-0"
           color="white"
-          hide-slider
         >
           <v-tab v-for="(label, i) in config.inlineTabs" :key="`home-inline-${label}`" :value="i">
             {{ label }}
@@ -186,7 +185,6 @@ function goBack() {
         grow
         class="mfuns-home-tabs mfuns-home-tabs--extension"
         color="white"
-        hide-slider
       >
         <v-tab v-for="(label, i) in config.extensionTabs" :key="`home-ext-${label}`" :value="i">
           {{ label }}
@@ -283,11 +281,18 @@ function goBack() {
   width: auto;
 }
 
-/* V2 v-tabs-slider on primary app bar */
-.mfuns-home-tabs--timeline :deep(.v-tab__slider) {
+/* V2 v-tabs-slider：仅选中 Tab 显示下划线 */
+.mfuns-home-tabs :deep(.v-tab__slider) {
   height: 2px;
-  opacity: 1;
   background-color: rgb(255, 255, 255);
+}
+
+.mfuns-home-tabs :deep(.v-tab:not(.v-tab--selected) .v-tab__slider) {
+  opacity: 0;
+}
+
+.mfuns-home-tabs :deep(.v-tab--selected .v-tab__slider) {
+  opacity: 1;
 }
 
 .mfuns-home-tabs :deep(.v-tab) {
