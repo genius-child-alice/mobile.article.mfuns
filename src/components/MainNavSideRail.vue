@@ -26,7 +26,7 @@ const activeValue = computed(() => {
 
 <template>
   <v-sheet
-    class="mfuns-side-rail theme--light"
+    class="mfuns-side-rail"
     border="end"
     rounded="0"
     elevation="0"

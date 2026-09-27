@@ -22,7 +22,7 @@ const activeValue = computed(() => {
 <template>
   <!-- DOM/classes from m.mfuns layout (Vuetify 2 bottom-navigation + shift) -->
   <div
-    class="v-item-group v-bottom-navigation bottom-bar mfuns-bottom-nav theme--light v-bottom-navigation--grow v-bottom-navigation--fixed v-bottom-navigation--shift link--text"
+    class="v-item-group v-bottom-navigation bottom-bar mfuns-bottom-nav v-bottom-navigation--grow v-bottom-navigation--fixed v-bottom-navigation--shift link--text"
     role="tablist"
   >
     <RouterLink
@@ -30,7 +30,7 @@ const activeValue = computed(() => {
       :key="item.value"
       v-ripple
       :to="item.to"
-      class="v-btn v-btn--router v-btn--is-elevated v-btn--has-bg theme--light v-size--default"
+      class="v-btn v-btn--router v-btn--is-elevated v-btn--has-bg v-size--default"
       :class="{ 'v-btn--active': activeValue === item.value }"
       role="tab"
       :aria-selected="activeValue === item.value"
@@ -38,7 +38,7 @@ const activeValue = computed(() => {
       <span class="v-btn__content">
         <span class="mfuns-bottom-nav__label">{{ item.label }}</span>
         <i
-          class="v-icon notranslate mdi theme--light"
+          class="v-icon notranslate mdi"
           :class="item.icon"
           aria-hidden="true"
         />

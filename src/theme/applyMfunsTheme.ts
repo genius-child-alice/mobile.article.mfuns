@@ -24,6 +24,9 @@ function setRootCssVars(config: MfunsThemeConfig): void {
   root.style.setProperty('--v-primary-base', config.primary)
   root.style.setProperty('--v-link-base', config.link)
   root.style.setProperty('--color-primary', config.primary)
+  root.style.colorScheme = config.dark ? 'dark' : 'light'
+  root.classList.toggle('mfuns-theme-dark', config.dark)
+  root.classList.toggle('mfuns-theme-light', !config.dark)
 }
 
 /** Apply theme colors globally (Vuetify 3 + document meta/CSS). */

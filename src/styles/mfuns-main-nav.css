@@ -19,16 +19,16 @@
   color: inherit;
 }
 
-.theme--light .mfuns-nuxt-link span {
-  color: #333;
+.mfuns-nuxt-link span {
+  color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
   font-size: 0.875rem;
   line-height: 1.25;
   font-weight: 400;
   margin-top: 2px;
 }
 
-.theme--light .mfuns-nuxt-link:not(.mfuns-nuxt-link--active) .v-icon {
-  color: rgba(0, 0, 0, 0.54);
+.mfuns-nuxt-link:not(.mfuns-nuxt-link--active) .v-icon {
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
 }
 
 /* Vuetify 2 side rail: default v-icon 24px */
@@ -56,8 +56,8 @@
   position: fixed;
   z-index: 4;
   height: 56px;
-  background-color: #fff;
-  color: rgba(0, 0, 0, 0.87);
+  background-color: rgb(var(--v-theme-surface));
+  color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
   box-shadow:
     0 2px 4px -1px rgba(0, 0, 0, 0.2),
     0 4px 5px 0 rgba(0, 0, 0, 0.14),
@@ -81,7 +81,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(0, 0, 0, 0.6) !important;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity)) !important;
   letter-spacing: 0;
 }
 

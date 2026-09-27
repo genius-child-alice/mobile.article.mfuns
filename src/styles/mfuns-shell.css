@@ -17,6 +17,16 @@ body {
   overscroll-behavior-y: none;
 }
 
+html.mfuns-theme-dark,
+html.mfuns-theme-dark body {
+  background-color: #121212;
+}
+
+html.mfuns-theme-light,
+html.mfuns-theme-light body {
+  background-color: #eef0f8;
+}
+
 #app {
   min-height: 100vh;
   min-height: 100dvh;
@@ -28,13 +38,13 @@ body {
 }
 
 .background {
-  background-color: #eef0f8;
+  background-color: rgb(var(--v-theme-background));
   min-height: 100vh;
   min-height: 100dvh;
 }
 
 .background-image {
-  background-color: #eef0f8;
+  background-color: rgb(var(--v-theme-background));
 }
 
 /* sm–md landscape: inline tabs live in the app bar row (see AppShellLayout). */
@@ -51,5 +61,6 @@ body {
 }
 
 .v-application.global-app {
-  background: transparent !important;
+  background: rgb(var(--v-theme-background)) !important;
+  color: rgb(var(--v-theme-on-background));
 }
