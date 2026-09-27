@@ -3,6 +3,7 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import { MFUNS_DISPLAY } from '../constants/mfunsDisplay'
 
 const sharedColors = {
   secondary: '#424242',
@@ -16,6 +17,10 @@ const sharedColors = {
 export const vuetify = createVuetify({
   components,
   directives,
+  display: {
+    mobileBreakpoint: MFUNS_DISPLAY.mobileBreakpoint,
+    thresholds: { ...MFUNS_DISPLAY.thresholds },
+  },
   theme: {
     defaultTheme: 'mfunsLight',
     themes: {

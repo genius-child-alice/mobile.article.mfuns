@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import MainNavBottomBar from '../components/MainNavBottomBar.vue'
 import MfunsAppBar from '../components/MfunsAppBar.vue'
 import MainNavSideRail from '../components/MainNavSideRail.vue'
 import { useMfunsShellLayout } from '../composables/useMfunsShellLayout'
@@ -23,14 +24,6 @@ const {
 } = useMfunsShellLayout({
   appBar: appBarConfig,
   showBottomNav,
-})
-
-const bottomNavValue = computed(() => {
-  const p = route.path
-  if (p === '/home' || p === '/') return 'home'
-  if (p.startsWith('/timeline')) return 'timeline'
-  if (p === '/member') return 'member'
-  return undefined
 })
 </script>
 
@@ -56,28 +49,7 @@ const bottomNavValue = computed(() => {
       </div>
     </v-main>
 
-    <v-bottom-navigation
-      v-if="showMainNavBottom"
-      app
-      grow
-      shift
-      color="link"
-      class="bottom-bar mfuns-bottom-nav"
-      :model-value="bottomNavValue"
-    >
-      <v-btn value="home" :to="{ path: '/home' }">
-        <span>首页</span>
-        <v-icon icon="mdi-home-variant-outline" />
-      </v-btn>
-      <v-btn value="timeline" :to="{ path: '/timeline' }">
-        <span>动态</span>
-        <v-icon icon="mdi-creation" />
-      </v-btn>
-      <v-btn value="member" :to="{ path: '/member' }">
-        <span>我的</span>
-        <v-icon icon="mdi-account-outline" />
-      </v-btn>
-    </v-bottom-navigation>
+    <MainNavBottomBar v-if="showMainNavBottom" />
   </v-app>
 </template>
 
@@ -91,6 +63,9 @@ const bottomNavValue = computed(() => {
 
 .mfuns-main {
   --v-layout-top: var(--mfuns-app-bar-height, 48px);
+  padding-bottom: calc(
+    var(--mfuns-bottom-nav-height, 0px) + env(safe-area-inset-bottom, 0px)
+  );
 }
 
 .mfuns-main__inner {
@@ -113,13 +88,5 @@ const bottomNavValue = computed(() => {
   max-width: 960px;
   margin-inline: auto;
   width: 100%;
-}
-
-.mfuns-bottom-nav {
-  --mfuns-bottom-nav-height: 56px;
-  height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
-  min-height: calc(56px + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px);
 }
 </style>

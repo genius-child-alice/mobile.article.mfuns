@@ -12,13 +12,13 @@ export function useMfunsShellLayout(options: {
   appBar: ComputedRef<MfunsAppBarConfig>
   showBottomNav: ComputedRef<boolean>
 }) {
-  const { xs, sm, mdAndUp } = useDisplay()
+  const { xs, sm, mdAndUp, mobile } = useDisplay()
 
   const showMainNavBottom = computed(
-    () => options.showBottomNav.value && xs.value,
+    () => options.showBottomNav.value && mobile.value,
   )
   const showMainNavLeft = computed(
-    () => options.showBottomNav.value && !xs.value,
+    () => options.showBottomNav.value && !mobile.value,
   )
 
   const showHomeExtensionTabs = computed(() => {
@@ -63,6 +63,7 @@ export function useMfunsShellLayout(options: {
     '--mfuns-bottom-nav-height': `${bottomNavHeight.value}px`,
     '--mfuns-left-nav-width': `${leftNavWidth.value}px`,
     '--v-layout-left': `${leftNavWidth.value}px`,
+    '--v-layout-bottom': `${bottomNavHeight.value}px`,
   }))
 
   return {

@@ -25,14 +25,19 @@ const activeValue = computed(() => {
 </script>
 
 <template>
-  <v-sheet class="mfuns-side-rail" border="end" rounded="0">
+  <v-sheet
+    class="mfuns-side-rail theme--light"
+    border="end"
+    rounded="0"
+    elevation="0"
+  >
     <RouterLink
       v-for="item in items"
       :key="item.value"
       v-ripple
       :to="item.to"
-      class="mfuns-side-rail__link"
-      :class="{ 'mfuns-side-rail__link--active': activeValue === item.value }"
+      class="mfuns-nuxt-link"
+      :class="{ 'mfuns-nuxt-link--active': activeValue === item.value }"
     >
       <v-icon :icon="item.icon" size="24" />
       <span>{{ item.label }}</span>
@@ -58,33 +63,5 @@ const activeValue = computed(() => {
   border-left: none;
   border-top: none;
   border-bottom: none;
-}
-
-.mfuns-side-rail__link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 74px;
-  height: 74px;
-  text-decoration: none;
-  color: rgba(var(--v-theme-on-surface), 0.87);
-  gap: 2px;
-}
-
-.mfuns-side-rail__link span {
-  font-size: 12px;
-  line-height: 1.2;
-  color: #333;
-}
-
-.mfuns-side-rail__link--active,
-.mfuns-side-rail__link--active span {
-  color: rgb(var(--v-theme-link)) !important;
-}
-
-.mfuns-side-rail__link--active :deep(.v-icon) {
-  color: rgb(var(--v-theme-link)) !important;
 }
 </style>

@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const router = useRouter()
-const { xs } = useDisplay()
+const { mobile } = useDisplay()
 
 const homeTabIndex = ref(0)
 const backExtensionTabIndex = ref(0)
@@ -83,7 +83,7 @@ function goBack() {
           </v-badge>
         </v-btn>
         <v-btn
-          v-if="xs"
+          v-if="mobile"
           icon
           variant="text"
           color="white"
