@@ -46,13 +46,18 @@ const {
     <v-main
       class="mfuns-main background-image"
       :class="{
-        'mfuns-main--wide': mdAndUp && !route.meta.shellFullBleed,
+        'mfuns-main--wide':
+          mdAndUp && !route.meta.shellFullBleed && !route.meta.shellStretchMain,
         'mfuns-main--full-bleed': route.meta.shellFullBleed,
+        'mfuns-main--stretch': route.meta.shellStretchMain,
       }"
     >
       <div
         class="mfuns-main__inner"
-        :class="{ 'mfuns-main__inner--full-bleed': route.meta.shellFullBleed }"
+        :class="{
+          'mfuns-main__inner--full-bleed': route.meta.shellFullBleed,
+          'mfuns-main__inner--stretch': route.meta.shellStretchMain,
+        }"
       >
         <router-view />
       </div>
@@ -63,21 +68,6 @@ const {
 </template>
 
 <style scoped>
-.mfuns-app--left-rail :deep(.v-app-bar) {
-  left: var(--mfuns-left-nav-width, 74px) !important;
-  width: calc(100% - var(--mfuns-left-nav-width, 74px)) !important;
-  max-width: calc(100% - var(--mfuns-left-nav-width, 74px)) !important;
-  right: auto !important;
-}
-
-/* Side rail is fixed (not Vuetify layout drawer); align main with app bar. */
-.mfuns-app--left-rail .mfuns-main {
-  margin-inline-start: var(--mfuns-left-nav-width, 74px);
-  width: calc(100% - var(--mfuns-left-nav-width, 74px));
-  max-width: calc(100% - var(--mfuns-left-nav-width, 74px));
-  padding-inline-start: 0;
-}
-
 .mfuns-main {
   --v-layout-top: var(--mfuns-app-bar-height, 48px);
   padding-bottom: calc(
@@ -108,6 +98,17 @@ const {
   margin-inline: 0;
   width: 100%;
   padding-inline: 0;
+}
+
+.mfuns-main__inner--full-bleed > :deep(*) {
+  width: 100%;
+  max-width: none;
+}
+
+.mfuns-main__inner--stretch {
+  max-width: none;
+  margin-inline: 0;
+  width: 100%;
 }
 
 .mfuns-main--wide .mfuns-main__inner--full-bleed {

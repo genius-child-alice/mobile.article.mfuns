@@ -79,3 +79,53 @@ html.mfuns-theme-dark .background-image {
   background: rgb(var(--v-theme-background)) !important;
   color: rgb(var(--v-theme-on-background));
 }
+
+.link--text {
+  color: rgb(var(--v-theme-link));
+  text-decoration: none;
+}
+
+.link--text:hover {
+  text-decoration: underline;
+}
+
+/*
+ * Left rail (fixed 74px): one column width = 100% − rail.
+ * Use margin + explicit width (not wrap padding) so we do not double-subtract ~74px on the right.
+ */
+.mfuns-app--left-rail.v-application {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  --v-layout-left: 0px !important;
+  --v-layout-right: 0px !important;
+}
+
+.mfuns-app--left-rail .v-application__wrap {
+  box-sizing: border-box;
+  margin-inline-start: var(--mfuns-left-nav-width, 74px);
+  width: calc(100% - var(--mfuns-left-nav-width, 74px));
+  max-width: calc(100% - var(--mfuns-left-nav-width, 74px));
+  padding-inline: 0 !important;
+}
+
+.mfuns-app--left-rail .v-app-bar {
+  left: var(--mfuns-left-nav-width, 74px) !important;
+  right: auto !important;
+  width: calc(100% - var(--mfuns-left-nav-width, 74px)) !important;
+  max-width: calc(100% - var(--mfuns-left-nav-width, 74px)) !important;
+}
+
+.mfuns-app--left-rail .v-main.mfuns-main {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+  --v-layout-left: 0px;
+  --v-layout-right: 0px;
+}
+
+.mfuns-app--left-rail .v-main.mfuns-main .v-main__scroller {
+  padding-inline: 0 !important;
+  max-width: 100%;
+}

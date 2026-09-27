@@ -155,6 +155,8 @@ function goLoginRequired(to: string) {
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: none;
+  align-self: stretch;
   min-height: calc(
     100vh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
       env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
@@ -170,9 +172,10 @@ function goLoginRequired(to: string) {
   box-sizing: border-box;
   flex: 1 1 auto;
   width: 100%;
-  max-width: 1400px;
-  margin-inline: auto;
+  max-width: none;
+  margin-inline: 0;
   padding: 0;
+  align-self: stretch;
 }
 
 .member-view--xs {

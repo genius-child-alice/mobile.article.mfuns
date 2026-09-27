@@ -62,7 +62,8 @@ export function useMfunsShellLayout(options: {
     '--mfuns-app-bar-height': `${appBarHeight.value}px`,
     '--mfuns-bottom-nav-height': `${bottomNavHeight.value}px`,
     '--mfuns-left-nav-width': `${leftNavWidth.value}px`,
-    '--v-layout-left': `${leftNavWidth.value}px`,
+    /* Side rail inset is on .v-application__wrap; do not double-apply Vuetify layout left. */
+    '--v-layout-left': '0px',
     '--v-layout-bottom': `${bottomNavHeight.value}px`,
   }))
 

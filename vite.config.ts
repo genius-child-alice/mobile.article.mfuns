@@ -9,4 +9,13 @@ export default defineConfig({
       autoImport: true,
     }),
   ],
+  server: {
+    proxy: {
+      '/v1': {
+        target: 'https://api.mfuns.net',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 })

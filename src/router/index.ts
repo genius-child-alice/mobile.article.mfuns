@@ -4,6 +4,7 @@ import AppShellLayout from '../layouts/AppShellLayout.vue'
 import RoutePlaceholder from '../views/RoutePlaceholder.vue'
 import SettingsThemesView from '../views/settings/SettingsThemesView.vue'
 import MemberView from '../views/member/MemberView.vue'
+import MemberLoginView from '../views/member/MemberLoginView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -13,12 +14,20 @@ import {
 
 const routeComponents: Partial<Record<string, Component>> = {
   '/member': MemberView,
+  '/member/login': MemberLoginView,
   '/settings/themes': SettingsThemesView,
 }
 
 const mainTabSet = new Set<string>(MAIN_TAB_PATHS)
 
 const shellFullBleedPaths = new Set(['/member', '/settings/themes'])
+
+/** Login/register: full main width like reference LoginPage (not 960px column). */
+const shellStretchMainPaths = new Set([
+  '/member/login',
+  '/member/register',
+  '/member/reset_password',
+])
 
 const childRoutes = STATIC_PAGE_PATHS.map((path) => {
   const segment = path.replace(/^\//, '')
@@ -30,6 +39,7 @@ const childRoutes = STATIC_PAGE_PATHS.map((path) => {
       title: pathToTitle(path),
       showBottomNav: mainTabSet.has(path),
       shellFullBleed: shellFullBleedPaths.has(path),
+      shellStretchMain: shellStretchMainPaths.has(path),
     },
   }
 })

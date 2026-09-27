@@ -54,3 +54,8 @@ export function useMemberAuth() {
 export function initMemberAuthFromStorage() {
   syncMemberAuth()
 }
+
+/** Update auth reactive state after login/logout in the same tab. */
+export function refreshMemberAuth() {
+  syncMemberAuth()
+}
