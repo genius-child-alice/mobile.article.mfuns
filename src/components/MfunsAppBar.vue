@@ -13,6 +13,7 @@ import { clearMemberHistory } from '../api/memberUserApi'
 import { refreshMemberProfile } from '../composables/useMemberProfile'
 import { readMemberAuthState } from '../auth/memberSession'
 import type { MfunsAppBarConfig } from '../router/resolveAppBar'
+import { useTimelineTabs } from '../composables/useTimelineTabs'
 
 const props = defineProps<{
   config: MfunsAppBarConfig
@@ -28,7 +29,7 @@ const { mobile } = useDisplay()
 const { isLoggedIn } = useMemberAuth()
 
 const homeTabIndex = ref(0)
-const timelineTabIndex = ref(0)
+const { tabIndex: timelineTabIndex, tabLabels: timelineTabLabels } = useTimelineTabs()
 const backExtensionTabIndex = ref(0)
 const searchQuery = ref('')
 const createDialogOpen = ref(false)
@@ -147,7 +148,7 @@ async function confirmClearHistory() {
         class="mfuns-home-tabs mfuns-home-tabs--timeline"
         color="white"
       >
-        <v-tab v-for="(label, i) in config.inlineTabs" :key="`tl-${label}`" :value="i">
+        <v-tab v-for="(label, i) in timelineTabLabels" :key="`tl-${label}`" :value="i">
           {{ label }}
         </v-tab>
       </v-tabs>

@@ -9,6 +9,7 @@ import SettingsSecurityView from '../views/settings/SettingsSecurityView.vue'
 import MemberView from '../views/member/MemberView.vue'
 import MemberLoginView from '../views/member/MemberLoginView.vue'
 import MemberHistoryView from '../views/member/MemberHistoryView.vue'
+import TimelineView from '../views/timeline/TimelineView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -17,6 +18,7 @@ import {
 } from './staticRoutePaths'
 
 const routeComponents: Partial<Record<string, Component>> = {
+  '/timeline': TimelineView,
   '/member': MemberView,
   '/member/login': MemberLoginView,
   '/member/history': MemberHistoryView,
