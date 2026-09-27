@@ -28,7 +28,14 @@ export interface MemberHistoryResource {
   type?: number
   title?: string
   cover?: string
+  summary?: string
   user?: { name?: string }
+  like_count?: number
+  comment_count?: number
+  view_count?: number
+  duration?: number
+  tag?: string[]
+  cover_meta?: { blurhash?: string }
 }
 
 export interface MemberHistoryItem {
@@ -47,6 +54,8 @@ export function fetchMemberUserInfo(
 ): Promise<MfunsApiEnvelope<MemberUserInfoData>> {
   return mfunsGet<MemberUserInfoData>('/user/info', undefined, token)
 }
+
+export const MFUNS_ARTICLE_RESOURCE_TYPE = 0
 
 export function fetchMemberHistory(
   token: string,

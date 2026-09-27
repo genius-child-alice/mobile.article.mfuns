@@ -3,6 +3,7 @@ import {
   fetchMemberHistory,
   fetchMemberLevelSection,
   fetchMemberUserInfo,
+  MFUNS_ARTICLE_RESOURCE_TYPE,
   type MemberHistoryItem,
   type MemberUserInfo,
 } from '../api/memberUserApi'
@@ -45,7 +46,7 @@ export async function refreshMemberProfile(): Promise<void> {
     try {
       const [infoRes, historyRes, levelRes] = await Promise.all([
         fetchMemberUserInfo(token),
-        fetchMemberHistory(token, 0, 0),
+        fetchMemberHistory(token, 0, MFUNS_ARTICLE_RESOURCE_TYPE),
         fetchMemberLevelSection(token),
       ])
 

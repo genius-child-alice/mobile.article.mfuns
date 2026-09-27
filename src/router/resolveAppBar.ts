@@ -106,7 +106,7 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     '/member/login': backBar('用户登录', { trailing: 'member-register' }),
     '/member/register': backBar('用户注册'),
     '/member/profile': backBar('账号资料'),
-    '/member/history': backBar('历史记录', { extensionTabs: ['文章', '视频'] }),
+    '/member/history': backBar('历史记录'),
     '/member/badges': backBar('徽章设置'),
     '/member/sign': backBar('每日签到'),
     '/member/sign_rank': backBar('签到排行榜'),

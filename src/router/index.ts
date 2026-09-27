@@ -8,6 +8,7 @@ import SettingsAboutView from '../views/settings/SettingsAboutView.vue'
 import SettingsSecurityView from '../views/settings/SettingsSecurityView.vue'
 import MemberView from '../views/member/MemberView.vue'
 import MemberLoginView from '../views/member/MemberLoginView.vue'
+import MemberHistoryView from '../views/member/MemberHistoryView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -18,6 +19,7 @@ import {
 const routeComponents: Partial<Record<string, Component>> = {
   '/member': MemberView,
   '/member/login': MemberLoginView,
+  '/member/history': MemberHistoryView,
   '/settings': SettingsView,
   '/settings/about': SettingsAboutView,
   '/settings/security': SettingsSecurityView,
@@ -28,6 +30,7 @@ const mainTabSet = new Set<string>(MAIN_TAB_PATHS)
 
 const shellFullBleedPaths = new Set([
   '/member',
+  '/member/history',
   '/settings',
   '/settings/about',
   '/settings/security',

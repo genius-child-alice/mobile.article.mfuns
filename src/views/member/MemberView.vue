@@ -59,6 +59,12 @@ function goLoginRequired(to: string) {
 function historyCover(item: (typeof history.value)[number]): string {
   return mfunsImageUrl(item.resource_info?.cover, 200)
 }
+
+function openHistoryItem(item: (typeof history.value)[number]) {
+  const id = item.resource_info?.id
+  if (!id) return
+  go(`/article/${id}`)
+}
 </script>
 
 <template>
@@ -163,10 +169,14 @@ function historyCover(item: (typeof history.value)[number]): string {
         </div>
         <div v-else class="member-history__row px-4 pb-3 d-flex">
           <div
-            v-for="item in history"
-            :key="item.id"
-            class="member-history__card flex-shrink-0 me-4"
-          >
+          v-for="item in history"
+          :key="item.id"
+          class="member-history__card flex-shrink-0 me-4"
+          role="button"
+          tabindex="0"
+          @click="openHistoryItem(item)"
+          @keydown.enter="openHistoryItem(item)"
+        >
             <v-card elevation="0" class="member-history__cover">
               <v-img
                 v-if="historyCover(item)"
