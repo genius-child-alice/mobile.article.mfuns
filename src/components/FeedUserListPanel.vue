@@ -8,9 +8,10 @@ const props = withDefaults(
     users: FeedFollowUserEntry[]
     modelValue: number
     /** 参考站：竖屏 / smAndDown 为 RowScroll 横滑，md+ 侧栏为纵向列表 */
-    layout?: 'vertical' | 'horizontal'
+    /** 顶栏在「关注」时才展示选中高亮（时间线 Tab 下不高亮「全部关注」等） */
+    showActiveState?: boolean
   }>(),
-  { layout: 'vertical' },
+  { layout: 'vertical', showActiveState: true },
 )
 
 const emit = defineEmits<{
@@ -54,6 +55,10 @@ function pick(userId: number) {
 function avatarSrc(entry: FollowListItem): string {
   return mfunsImageUrl(entry.avatar, 80)
 }
+
+function isActive(entryId: number): boolean {
+  return props.showActiveState && props.modelValue === entryId
+}
 </script>
 
 <template>
@@ -69,14 +74,14 @@ function avatarSrc(entry: FollowListItem): string {
         :key="entry.id"
         type="button"
         class="feed-user-list__chip flex-shrink-0"
-        :class="{ 'feed-user-list__chip--active': modelValue === entry.id }"
+        :class="{ 'feed-user-list__chip--active': isActive(entry.id) }"
         @click="pick(entry.id)"
       >
         <v-avatar
           v-if="entry.isAll"
           size="44"
-          :color="modelValue === 0 ? 'primary' : undefined"
-          :variant="modelValue === 0 ? 'flat' : 'tonal'"
+          :color="isActive(0) ? 'primary' : undefined"
+          :variant="isActive(0) ? 'flat' : 'tonal'"
         >
           <v-icon icon="mdi-account-group" size="22" />
         </v-avatar>
@@ -99,7 +104,7 @@ function avatarSrc(entry: FollowListItem): string {
       <v-list-item
         v-for="entry in items"
         :key="entry.id"
-        :active="modelValue === entry.id"
+        :active="isActive(entry.id)"
         color="primary"
         rounded="lg"
         @click="pick(entry.id)"

@@ -113,6 +113,7 @@ onMounted(() => {
                   v-if="smAndDown"
                   v-model="selectUserId"
                   layout="horizontal"
+                  :show-active-state="tabIndex === 1"
                   class="mb-2"
                   :users="followUsers"
                   @select="syncFollowFeedParams"
@@ -126,6 +127,7 @@ onMounted(() => {
           <FeedUserListPanel
             v-if="isLoggedIn"
             v-model="selectUserId"
+            :show-active-state="tabIndex === 1"
             :users="followUsers"
             @select="onSelectUser"
           />
