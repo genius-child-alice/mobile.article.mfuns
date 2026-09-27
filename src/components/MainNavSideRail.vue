@@ -27,7 +27,6 @@ const activeValue = computed(() => {
 <template>
   <v-sheet
     class="mfuns-side-rail"
-    border="end"
     rounded="0"
     elevation="0"
   >
@@ -60,8 +59,7 @@ const activeValue = computed(() => {
   flex-direction: column;
   align-items: stretch;
   background: rgb(var(--v-theme-surface));
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
+  border-block: none;
+  border-inline-start: none;
 }
 </style>

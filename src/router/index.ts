@@ -3,6 +3,7 @@ import type { Component } from 'vue'
 import AppShellLayout from '../layouts/AppShellLayout.vue'
 import RoutePlaceholder from '../views/RoutePlaceholder.vue'
 import SettingsThemesView from '../views/settings/SettingsThemesView.vue'
+import MemberView from '../views/member/MemberView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -11,12 +12,13 @@ import {
 } from './staticRoutePaths'
 
 const routeComponents: Partial<Record<string, Component>> = {
+  '/member': MemberView,
   '/settings/themes': SettingsThemesView,
 }
 
 const mainTabSet = new Set<string>(MAIN_TAB_PATHS)
 
-const shellFullBleedPaths = new Set(['/settings/themes'])
+const shellFullBleedPaths = new Set(['/member', '/settings/themes'])
 
 const childRoutes = STATIC_PAGE_PATHS.map((path) => {
   const segment = path.replace(/^\//, '')

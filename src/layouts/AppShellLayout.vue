@@ -70,6 +70,14 @@ const {
   right: auto !important;
 }
 
+/* Side rail is fixed (not Vuetify layout drawer); align main with app bar. */
+.mfuns-app--left-rail .mfuns-main {
+  margin-inline-start: var(--mfuns-left-nav-width, 74px);
+  width: calc(100% - var(--mfuns-left-nav-width, 74px));
+  max-width: calc(100% - var(--mfuns-left-nav-width, 74px));
+  padding-inline-start: 0;
+}
+
 .mfuns-main {
   --v-layout-top: var(--mfuns-app-bar-height, 48px);
   padding-bottom: calc(
@@ -87,10 +95,6 @@ const {
       env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
   padding-inline: env(safe-area-inset-right, 0px);
-}
-
-.mfuns-app--left-rail .mfuns-main__inner {
-  padding-left: 0;
 }
 
 .mfuns-main--wide .mfuns-main__inner {

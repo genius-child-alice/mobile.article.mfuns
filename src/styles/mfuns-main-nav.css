@@ -5,6 +5,8 @@
 /* —— Side rail —— */
 .mfuns-side-rail {
   box-shadow: none;
+  /* V2 side rail / v-divider — right edge separator */
+  border-inline-end: 1px solid rgba(var(--v-theme-on-surface), 0.12);
 }
 
 .mfuns-nuxt-link {
