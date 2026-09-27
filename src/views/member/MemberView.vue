@@ -147,7 +147,7 @@ function historyCover(item: (typeof history.value)[number]): string {
         >
           暂无浏览记录
         </div>
-        <div v-else class="member-history__row px-4 pb-3 d-flex overflow-x-auto">
+        <div v-else class="member-history__row px-4 pb-3 d-flex">
           <div
             v-for="item in history"
             :key="item.id"
@@ -291,7 +291,14 @@ function historyCover(item: (typeof history.value)[number]): string {
 }
 
 .member-history__row {
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.member-history__row::-webkit-scrollbar {
+  display: none;
 }
 
 .member-history__card {
