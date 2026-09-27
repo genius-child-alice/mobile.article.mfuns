@@ -24,25 +24,61 @@ function joinUrl(path: string): string {
   return `${API_BASE.replace(/\/$/, '')}${normalized}`
 }
 
+function buildJsonHeaders(token?: string | null): HeadersInit {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  }
+  const trimmed = token?.trim()
+  if (trimmed) {
+    headers.Authorization = trimmed
+  }
+  return headers
+}
+
+async function parseEnvelope<T>(res: Response): Promise<MfunsApiEnvelope<T>> {
+  try {
+    return (await res.json()) as MfunsApiEnvelope<T>
+  } catch {
+    throw new MfunsApiError(0, res.ok ? '响应解析失败' : `网络错误 (${res.status})`)
+  }
+}
+
 export async function mfunsPost<T = unknown>(
   path: string,
   body: Record<string, unknown>,
+  token?: string | null,
 ): Promise<MfunsApiEnvelope<T>> {
   const res = await fetch(joinUrl(path), {
     method: 'POST',
     headers: {
-      Accept: 'application/json',
+      ...buildJsonHeaders(token),
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
   })
 
-  let payload: MfunsApiEnvelope<T>
-  try {
-    payload = (await res.json()) as MfunsApiEnvelope<T>
-  } catch {
-    throw new MfunsApiError(0, res.ok ? '响应解析失败' : `网络错误 (${res.status})`)
+  return parseEnvelope<T>(res)
+}
+
+export async function mfunsGet<T = unknown>(
+  path: string,
+  params?: Record<string, string | number | undefined>,
+  token?: string | null,
+): Promise<MfunsApiEnvelope<T>> {
+  let url = joinUrl(path)
+  if (params) {
+    const search = new URLSearchParams()
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== '') search.set(key, String(value))
+    }
+    const qs = search.toString()
+    if (qs) url += `${url.includes('?') ? '&' : '?'}${qs}`
   }
 
-  return payload
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: buildJsonHeaders(token),
+  })
+
+  return parseEnvelope<T>(res)
 }

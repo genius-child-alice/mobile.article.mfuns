@@ -1,24 +1,40 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useDisplay, useTheme } from 'vuetify'
 import { MEMBER_SERVICE_ITEMS } from '../../constants/memberServices'
 import { useMemberAuth } from '../../composables/useMemberAuth'
+import { useMemberProfile } from '../../composables/useMemberProfile'
+import { mfunsImageUrl } from '../../utils/mfunsImageUrl'
 
 const router = useRouter()
 const { xs } = useDisplay()
 const theme = useTheme()
 const { isLoggedIn } = useMemberAuth()
+const {
+  memberInfo,
+  history,
+  nekoCoin,
+  fansCount,
+  followCount,
+  memberId,
+  profileSubtitle,
+  refreshMemberProfile,
+} = useMemberProfile()
 
 const guestIconColor = computed(() =>
   theme.global.current.value.dark ? 'high-emphasis' : 'medium-emphasis',
 )
 
-/** Placeholder until member API is wired. */
-const nekoCoin = computed(() => 0)
-const fansCount = computed(() => 0)
-const followCount = computed(() => 0)
-const memberId = computed(() => 0)
+const avatarSrc = computed(() => mfunsImageUrl(memberInfo.value?.avatar, 96))
+
+watch(
+  isLoggedIn,
+  (loggedIn) => {
+    if (loggedIn) void refreshMemberProfile()
+  },
+  { immediate: true },
+)
 
 function formatCount(value: number): string {
   if (value >= 10000) return `${(value / 10000).toFixed(1)}万`
@@ -35,6 +51,10 @@ function goLoginRequired(to: string) {
     return
   }
   router.push(to)
+}
+
+function historyCover(item: (typeof history.value)[number]): string {
+  return mfunsImageUrl(item.resource_info?.cover, 200)
 }
 </script>
 
@@ -70,11 +90,16 @@ function goLoginRequired(to: string) {
         @keydown.enter="go('/member/profile')"
       >
         <v-avatar size="48" color="grey-lighten-2" class="me-3">
-          <v-icon icon="mdi-account" size="32" />
+          <v-img v-if="avatarSrc" :src="avatarSrc" cover />
+          <v-icon v-else icon="mdi-account" size="32" />
         </v-avatar>
         <div class="flex-grow-1 min-width-0">
-          <div class="text-subtitle-1 font-weight-medium">个人资料</div>
-          <div class="text-caption text-medium-emphasis">查看与编辑账号资料</div>
+          <div class="text-subtitle-1 font-weight-medium text-truncate">
+            {{ memberInfo?.name || '个人资料' }}
+          </div>
+          <div class="text-caption text-medium-emphasis text-truncate">
+            {{ profileSubtitle }}
+          </div>
         </div>
         <v-icon icon="mdi-arrow-right" color="medium-emphasis" />
       </div>
@@ -83,7 +108,7 @@ function goLoginRequired(to: string) {
 
       <v-card-text class="member-stats d-flex justify-space-between text-center py-4">
         <div class="member-stats__cell flex-fill">
-          <div class="text-h6 font-weight-bold text-link">{{ formatCount(nekoCoin) }}</div>
+          <div class="member-stats__value text-link">{{ formatCount(nekoCoin) }}</div>
           <div class="text-body-2 text-medium-emphasis">喵币</div>
         </div>
         <div
@@ -92,7 +117,7 @@ function goLoginRequired(to: string) {
           tabindex="0"
           @click="goLoginRequired(`/follow/fans/${memberId}`)"
         >
-          <div class="text-h6 font-weight-bold text-link">{{ formatCount(fansCount) }}</div>
+          <div class="member-stats__value text-link">{{ formatCount(fansCount) }}</div>
           <div class="text-body-2 text-medium-emphasis">粉丝</div>
         </div>
         <div
@@ -101,7 +126,7 @@ function goLoginRequired(to: string) {
           tabindex="0"
           @click="goLoginRequired(`/follow/follow/${memberId}`)"
         >
-          <div class="text-h6 font-weight-bold text-link">{{ formatCount(followCount) }}</div>
+          <div class="member-stats__value text-link">{{ formatCount(followCount) }}</div>
           <div class="text-body-2 text-medium-emphasis">关注</div>
         </div>
       </v-card-text>
@@ -116,8 +141,36 @@ function goLoginRequired(to: string) {
             查看全部
           </RouterLink>
         </div>
-        <div class="member-history__scroll px-4 pb-3 text-body-2 text-medium-emphasis">
+        <div
+          v-if="history.length === 0"
+          class="member-history__scroll px-4 pb-3 text-body-2 text-medium-emphasis"
+        >
           暂无浏览记录
+        </div>
+        <div v-else class="member-history__row px-4 pb-3 d-flex overflow-x-auto">
+          <div
+            v-for="item in history"
+            :key="item.id"
+            class="member-history__card flex-shrink-0 me-4"
+          >
+            <v-card elevation="0" class="member-history__cover">
+              <v-img
+                v-if="historyCover(item)"
+                :src="historyCover(item)"
+                cover
+                aspect-ratio="1.7778"
+              />
+              <div v-else class="member-history__cover-placeholder d-flex align-center justify-center">
+                <v-icon icon="mdi-image-off-outline" color="medium-emphasis" />
+              </div>
+            </v-card>
+            <div class="member-history__title text-body-2 mt-1">
+              {{ item.resource_info?.title || '未命名' }}
+            </div>
+            <div class="text-body-2 text-medium-emphasis text-truncate">
+              {{ item.resource_info?.user?.name || '' }}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -221,6 +274,13 @@ function goLoginRequired(to: string) {
   color: rgb(var(--v-theme-link));
 }
 
+.member-stats__value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.334;
+  letter-spacing: 0;
+}
+
 .member-history__more {
   text-decoration: none;
   color: rgb(var(--v-theme-link));
@@ -228,6 +288,32 @@ function goLoginRequired(to: string) {
 
 .member-history__scroll {
   min-height: 48px;
+}
+
+.member-history__row {
+  -webkit-overflow-scrolling: touch;
+}
+
+.member-history__card {
+  width: 140px;
+}
+
+.member-history__cover {
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.member-history__cover-placeholder {
+  aspect-ratio: 16 / 9;
+  background: rgba(var(--v-theme-on-surface), 0.06);
+}
+
+.member-history__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 40px;
 }
 
 .member-service-col {

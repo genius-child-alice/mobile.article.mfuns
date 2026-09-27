@@ -6,6 +6,7 @@ import { extractLoginToken, loginMember } from '../../api/memberAuthApi'
 import { MfunsApiError } from '../../api/mfunsApi'
 import { persistMemberAuth } from '../../auth/memberSession'
 import { refreshMemberAuth, useMemberAuth } from '../../composables/useMemberAuth'
+import { refreshMemberProfile } from '../../composables/useMemberProfile'
 
 const router = useRouter()
 const { isLoggedIn } = useMemberAuth()
@@ -49,6 +50,7 @@ async function submitLogin() {
 
     persistMemberAuth(token)
     refreshMemberAuth()
+    await refreshMemberProfile()
 
     if (window.history.length > 1) router.back()
     else router.replace('/member')
