@@ -10,6 +10,7 @@ import MemberView from '../views/member/MemberView.vue'
 import MemberLoginView from '../views/member/MemberLoginView.vue'
 import MemberHistoryView from '../views/member/MemberHistoryView.vue'
 import TimelineView from '../views/timeline/TimelineView.vue'
+import HomeView from '../views/home/HomeView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -18,6 +19,7 @@ import {
 } from './staticRoutePaths'
 
 const routeComponents: Partial<Record<string, Component>> = {
+  '/home': HomeView,
   '/timeline': TimelineView,
   '/member': MemberView,
   '/member/login': MemberLoginView,
@@ -41,6 +43,7 @@ const shellFullBleedPaths = new Set([
 
 /** Login/register: full main width like reference LoginPage (not 960px column). */
 const shellStretchMainPaths = new Set([
+  '/home',
   '/timeline',
   '/member/login',
   '/member/register',

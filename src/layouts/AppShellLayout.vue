@@ -109,6 +109,7 @@ const {
   max-width: none;
   margin-inline: 0;
   width: 100%;
+  padding-inline: 0;
 }
 
 .mfuns-main--wide .mfuns-main__inner--full-bleed {

@@ -62,6 +62,20 @@ html.mfuns-theme-dark .background-image {
   background-image: none;
 }
 
+.scroll-y-style {
+  overflow-y: auto;
+}
+
+.scroll-y-style::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: hsla(0, 0%, 50%, 0.01);
+}
+
+.scroll-y-style::-webkit-scrollbar-thumb {
+  background-color: hsla(0, 0%, 50%, 0.3);
+}
+
 /* sm–md landscape: inline tabs live in the app bar row (see AppShellLayout). */
 @media (min-width: 600px) and (max-width: 959px) {
   .global-app {

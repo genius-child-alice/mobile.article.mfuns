@@ -1,0 +1,43 @@
+/* m.mfuns ContentCard / 1fdd2dd.css */
+.content-block {
+  contain-intrinsic-size: 192px;
+  content-visibility: auto;
+}
+
+.card-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.65em;
+  line-height: 1.25;
+}
+
+.tag-info {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+}
+
+.tag {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 11px;
+  margin-left: 4px;
+  padding: 2px 4px;
+}
+
+.content-info {
+  align-content: center;
+  background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+  bottom: 0;
+  color: #fff;
+  display: flex;
+  font-size: 12px;
+  padding-left: 4px;
+  padding-top: 10px;
+  position: absolute;
+  width: 100%;
+}

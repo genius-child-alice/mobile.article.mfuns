@@ -14,6 +14,7 @@ import { refreshMemberProfile } from '../composables/useMemberProfile'
 import { readMemberAuthState } from '../auth/memberSession'
 import type { MfunsAppBarConfig } from '../router/resolveAppBar'
 import { useTimelineTabs } from '../composables/useTimelineTabs'
+import { useHomeTabs } from '../composables/useHomeTabs'
 
 const props = defineProps<{
   config: MfunsAppBarConfig
@@ -28,7 +29,7 @@ const router = useRouter()
 const { mobile } = useDisplay()
 const { isLoggedIn } = useMemberAuth()
 
-const homeTabIndex = ref(0)
+const { tabIndex: homeTabIndex } = useHomeTabs()
 const { tabIndex: timelineTabIndex, tabLabels: timelineTabLabels } = useTimelineTabs()
 const backExtensionTabIndex = ref(0)
 const searchQuery = ref('')

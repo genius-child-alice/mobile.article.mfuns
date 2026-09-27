@@ -8,6 +8,7 @@ import { normalizeThemeConfig, readStoredMfunsTheme } from './theme/storage'
 import { initMemberAuthFromStorage } from './composables/useMemberAuth'
 import './styles/mfuns-shell.css'
 import './styles/mfuns-main-nav.css'
+import './styles/mfuns-home-content.css'
 
 const initialTheme = normalizeThemeConfig(
   readStoredMfunsTheme() ?? { ...MFUNS_DEFAULT_THEME, index: 0 },

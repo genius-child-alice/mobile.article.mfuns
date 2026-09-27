@@ -5,6 +5,7 @@ import { mfunsImageUrl } from '../utils/mfunsImageUrl'
 
 const props = defineProps<{
   data?: MemberHistoryResource | null
+  rank?: number
 }>()
 
 const emit = defineEmits<{
@@ -49,8 +50,9 @@ function formatDuration(seconds: number): string {
     </div>
 
     <div class="article-content-bar__body ms-2 d-flex flex-column flex-grow-1 justify-space-between min-width-0">
-      <div class="article-content-bar__title">
-        {{ data?.title || '未命名' }}
+      <div class="article-content-bar__title d-flex align-start ga-1">
+        <span v-if="rank != null" class="article-content-bar__rank flex-shrink-0">{{ rank }}</span>
+        <span class="min-width-0">{{ data?.title || '未命名' }}</span>
       </div>
       <div class="article-content-bar__author text-truncate">
         {{ data?.user?.name || '' }}
@@ -95,14 +97,24 @@ function formatDuration(seconds: number): string {
   height: 90px;
 }
 
+.article-content-bar__rank {
+  color: rgb(var(--v-theme-primary));
+  font-weight: 700;
+  min-width: 1.25rem;
+}
+
 .article-content-bar__title {
   height: 40px;
   overflow: hidden;
   font-size: 0.87rem;
   line-height: 1.25rem;
+}
+
+.article-content-bar__title > span:last-child {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .article-content-bar__author {
