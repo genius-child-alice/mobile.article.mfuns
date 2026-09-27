@@ -15,6 +15,7 @@ export interface FeedUser {
   name?: string
   name_color?: string
   avatar?: string
+  level_id?: number
   badges?: number[]
   info?: string
   fans?: number
@@ -44,6 +45,9 @@ export interface FeedFollowUserEntry {
   user_id?: number
   name?: string
   avatar?: string
+  info?: string
+  level_id?: number
+  badges?: number[]
   user?: FeedUser
 }
 
