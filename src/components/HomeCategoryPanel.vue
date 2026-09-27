@@ -23,7 +23,7 @@ onMounted(async () => {
 <template>
   <div class="home-category-panel">
     <v-progress-linear v-if="loading" indeterminate color="primary" />
-    <v-row v-else dense>
+    <v-row v-else dense class="home-category-panel__row">
       <v-col v-for="cat in categories" :key="cat.id" cols="4" sm="3" md="2">
         <v-sheet
           v-ripple
@@ -42,6 +42,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+/* 竖屏：分区宫格外边距 */
+@media (orientation: portrait) {
+  .home-category-panel__row {
+    padding: 8px !important;
+  }
+}
+
 /* 与 MainNavSideRail `.mfuns-side-rail` 右边框一致 */
 .home-category-panel__cell {
   --home-category-border-color: rgba(var(--v-theme-on-surface), 0.12);
