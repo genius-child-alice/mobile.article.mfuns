@@ -22,6 +22,20 @@ const showDuration = computed(
   () => props.data?.duration != null && props.data.duration !== 0,
 )
 
+/** 参考站 ContentBar rankClass */
+const rankClass = computed(() => {
+  switch (props.rank) {
+    case 1:
+      return 'list-rank list-rank-1'
+    case 2:
+      return 'list-rank list-rank-2'
+    case 3:
+      return 'list-rank list-rank-3'
+    default:
+      return 'list-rank list-rank-other'
+  }
+})
+
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60)
   const s = Math.floor(seconds % 60)
@@ -31,7 +45,7 @@ function formatDuration(seconds: number): string {
 
 <template>
   <v-card
-    class="article-content-bar list d-flex overflow-hidden"
+    class="article-content-bar list content-bar d-flex overflow-hidden"
     :class="{ 'article-content-bar--transparent': transparent }"
     elevation="0"
     :color="transparent ? 'rgba(0, 0, 0, 0)' : undefined"
@@ -54,9 +68,14 @@ function formatDuration(seconds: number): string {
     </div>
 
     <div class="article-content-bar__body ms-2 d-flex flex-column flex-grow-1 justify-space-between min-width-0">
-      <div class="article-content-bar__title d-flex align-start ga-1">
-        <span v-if="rank != null" class="article-content-bar__rank flex-shrink-0">{{ rank }}</span>
-        <span class="min-width-0">{{ data?.title || '未命名' }}</span>
+      <!-- 参考站：标题左、排名徽章右 -->
+      <div class="article-content-bar__title d-flex flex-row">
+        <div class="article-content-bar__title-text flex-fill min-width-0">
+          {{ data?.title || '未命名' }}
+        </div>
+        <div v-if="rank" class="pl-2 flex-shrink-0">
+          <div :class="rankClass">{{ rank }}</div>
+        </div>
       </div>
       <div class="article-content-bar__author text-truncate">
         {{ data?.user?.name || '' }}
@@ -105,20 +124,45 @@ function formatDuration(seconds: number): string {
   height: 90px;
 }
 
-.article-content-bar__rank {
-  color: rgb(var(--v-theme-primary));
+/* 参考站 05cba54.css / ContentBar list-rank* */
+.list-rank {
+  border-radius: 4px;
+  font-size: 13px;
   font-weight: 700;
-  min-width: 1.25rem;
+  height: 22px;
+  line-height: 22px;
+  text-align: center;
+  width: 28px;
+}
+
+.list-rank-1 {
+  background-color: gold;
+  color: #d28f00;
+}
+
+.list-rank-2 {
+  background-color: silver;
+  color: #9d9d9d;
+}
+
+.list-rank-3 {
+  background-color: #deb887;
+  color: #bd9269;
+}
+
+.list-rank-other {
+  background-color: #ddd;
+  color: #8a8a8a;
 }
 
 .article-content-bar__title {
-  height: 40px;
+  height: 44px;
   overflow: hidden;
   font-size: 0.87rem;
   line-height: 1.25rem;
 }
 
-.article-content-bar__title > span:last-child {
+.article-content-bar__title-text {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
