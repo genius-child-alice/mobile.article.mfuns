@@ -5,32 +5,11 @@ import NotifyCard, { type NotifyCardData } from '../../components/NotifyCard.vue
 import PullRefresh from '../../components/PullRefresh.vue'
 import { useNotifyList } from '../../composables/useNotifyList'
 
-function contentTypeLabel(t: number | undefined): string {
-  switch (t) {
-    case 0:
-      return '文章'
-    case 1:
-      return '视频'
-    case 2:
-      return '插画'
-    case 3:
-      return '动态'
-    case 4:
-      return '评论'
-    default:
-      return '内容'
-  }
-}
-
 function mapItem(e: NotifyListItem): NotifyCardData {
-  const count = e.notify_params?.count ?? 1
-  let info =
-    count === 1 ? '点赞了你的' : `等${count}人点赞了你的`
-  info += contentTypeLabel(e.content_type)
   return {
     id: e.id,
     user: e.user,
-    info,
+    info: e.notify_params?.reply_text,
     content: e.notify_params?.text,
     time: e.created_at,
     resource_id: e.content_id,
@@ -38,11 +17,11 @@ function mapItem(e: NotifyListItem): NotifyCardData {
   }
 }
 
-const { list, refresh, showMore } = useNotifyList(1, mapItem)
+const { list, refresh, showMore } = useNotifyList(2, mapItem)
 </script>
 
 <template>
-  <!-- 参考 LikeNotify -->
+  <!-- 参考 CommentMention -->
   <div class="scrollbar">
     <PullRefresh @download="showMore" @refresh="refresh">
       <NotifyCard v-for="(item, i) in list" :key="item.id ?? i" :data="item" />

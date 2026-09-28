@@ -8,6 +8,7 @@ import FeedMemberInfoRow from './FeedMemberInfoRow.vue'
 import MfunsRichText from './MfunsRichText.vue'
 
 export interface NotifyCardData {
+  id?: number
   user?: MemberUserInfo
   info?: string
   content?: string
@@ -43,25 +44,18 @@ function goResource() {
 </script>
 
 <template>
-  <div class="notify-card">
+  <!-- 参考 NotifyCard：MemberInfo + 灰底正文 + divider -->
+  <div class="notify-card" style="max-width: 100vw">
     <v-sheet v-ripple class="pb-2" @click="goResource">
-      <FeedMemberInfoRow :data="memberData">
-        <span class="text-medium-emphasis text-caption">{{ timeLabel }}</span>
-      </FeedMemberInfoRow>
-      <v-sheet class="notify-card__body ml-16 mr-3 pa-3">
+      <div @click.stop>
+        <FeedMemberInfoRow :data="memberData" to-user>
+          <span class="text-medium-emphasis text-caption">{{ timeLabel }}</span>
+        </FeedMemberInfoRow>
+      </div>
+      <v-sheet class="ml-16 mr-3 pa-3" color="rgba(128,128,128,0.2)">
         <MfunsRichText :text="data.content" :type="0" />
       </v-sheet>
     </v-sheet>
     <v-divider />
   </div>
 </template>
-
-<style scoped>
-.notify-card {
-  max-width: 100vw;
-}
-
-.notify-card__body {
-  background: rgba(128, 128, 128, 0.2);
-}
-</style>

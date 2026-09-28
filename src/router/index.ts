@@ -30,6 +30,7 @@ import MessageView from '../views/message/MessageView.vue'
 import MessageMentionView from '../views/message/MessageMentionView.vue'
 import MessageLikeView from '../views/message/MessageLikeView.vue'
 import MessageNotifyView from '../views/message/MessageNotifyView.vue'
+import MessageCommentView from '../views/message/MessageCommentView.vue'
 import MessageChatView from '../views/message/MessageChatView.vue'
 import {
   MAIN_TAB_PATHS,
@@ -173,7 +174,7 @@ export const router = createRouter({
             {
               path: 'comment',
               name: pathToRouteName('/message/comment'),
-              component: RoutePlaceholder,
+              component: MessageCommentView,
               meta: messageChildMeta('/message/comment'),
             },
             {
