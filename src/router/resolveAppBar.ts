@@ -62,6 +62,10 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     return NO_BAR
   }
 
+  if (path.startsWith('/message/chat/')) {
+    return backBar('私信')
+  }
+
   if (path === '/member') {
     return {
       visible: true,
@@ -130,10 +134,12 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     '/playlist/mylist': backBar('收藏夹列表', { trailing: 'playlist-new' }),
     '/media': backBar('媒体库'),
     '/message': backBar('消息中心'),
-    '/message/comment': backBar(''),
-    '/message/like': backBar(''),
-    '/message/mention': backBar(''),
-    '/message/list': backBar(''),
+    '/message/comment': backBar('回复'),
+    '/message/like': backBar('点赞'),
+    '/message/mention': backBar('提及'),
+    '/message/notify': backBar('通知'),
+    '/message/list': backBar('私信'),
+    '/message/chat': backBar('私信'),
     '/settings': backBar('设置'),
     '/settings/about': backBar('关于'),
     '/settings/security': backBar('安全设置'),

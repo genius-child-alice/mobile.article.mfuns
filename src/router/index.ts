@@ -26,6 +26,7 @@ import CreateArticleView from '../views/create/CreateArticleView.vue'
 import CreateFeedView from '../views/create/CreateFeedView.vue'
 import CreateSuccessView from '../views/create/CreateSuccessView.vue'
 import LeaderboardView from '../views/leaderboard/LeaderboardView.vue'
+import MessageView from '../views/message/MessageView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -47,6 +48,7 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/playlist/mylist': PlaylistMyListView,
   '/blackroom': BlackroomView,
   '/leaderboard': LeaderboardView,
+  '/message': MessageView,
   '/create': CreateView,
   '/create/article': CreateArticleView,
   '/create/feed': CreateFeedView,
@@ -71,6 +73,12 @@ const shellFullBleedPaths = new Set([
   '/create/article',
   '/create/feed',
   '/create/success',
+  '/message',
+  '/message/comment',
+  '/message/like',
+  '/message/mention',
+  '/message/notify',
+  '/message/list',
   '/settings',
   '/settings/about',
   '/settings/security',
@@ -141,6 +149,16 @@ export const router = createRouter({
             title: '收藏夹',
             showBottomNav: false,
             shellStretchMain: true,
+          },
+        },
+        {
+          path: 'message/chat/:uid',
+          name: 'message-chat',
+          component: RoutePlaceholder,
+          meta: {
+            title: '私信',
+            showBottomNav: false,
+            shellFullBleed: true,
           },
         },
         {

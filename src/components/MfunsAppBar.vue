@@ -23,6 +23,7 @@ import type { MfunsAppBarConfig } from '../router/resolveAppBar'
 import { useTimelineTabs } from '../composables/useTimelineTabs'
 import { useHomeTabs } from '../composables/useHomeTabs'
 import { useLeaderboardTabs } from '../composables/useLeaderboardTabs'
+import { useNotifyCount } from '../composables/useNotifyCount'
 
 const props = defineProps<{
   config: MfunsAppBarConfig
@@ -49,8 +50,7 @@ const searchQuery = ref('')
 const createDialogOpen = ref(false)
 const createMenuOpen = ref(false)
 
-/** Placeholder until notify API is wired. */
-const notifyCount = ref(0)
+const { badgeTotal: notifyCount } = useNotifyCount()
 const historyClearDialog = useMemberHistoryClearDialog()
 const historyClearLoading = ref(false)
 const createArticleTitleOverride = useCreateArticleTitleOverride()
@@ -128,7 +128,7 @@ async function confirmClearHistory() {
         >
           <v-badge
             :model-value="notifyCount > 0"
-            :content="notifyCount"
+            :content="String(notifyCount)"
             color="red"
             overlap
           >
