@@ -25,6 +25,7 @@ import CreateView from '../views/create/CreateView.vue'
 import CreateArticleView from '../views/create/CreateArticleView.vue'
 import CreateFeedView from '../views/create/CreateFeedView.vue'
 import CreateSuccessView from '../views/create/CreateSuccessView.vue'
+import LeaderboardView from '../views/leaderboard/LeaderboardView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -45,6 +46,7 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/media': MediaView,
   '/playlist/mylist': PlaylistMyListView,
   '/blackroom': BlackroomView,
+  '/leaderboard': LeaderboardView,
   '/create': CreateView,
   '/create/article': CreateArticleView,
   '/create/feed': CreateFeedView,
@@ -81,6 +83,7 @@ const shellStretchMainPaths = new Set([
   '/timeline',
   '/premium',
   '/media',
+  '/leaderboard',
   '/member/login',
   '/member/register',
   '/member/reset_password',

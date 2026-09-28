@@ -120,6 +120,7 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     '/member/sign': backBar('每日签到', { trailing: 'sign-rank' }),
     '/member/sign_rank': backBar('签到排行榜'),
     '/member/reset_password': backBar('重置密码'),
+    /** extensionTabs 占位以启用 extended；实际标签由 useLeaderboardTabs 动态填充 */
     '/leaderboard': backBar('全站排行', { extensionTabs: ['全站排行'] }),
     '/blackroom': backBar('小黑屋'),
     '/create': backBar('投稿中心'),

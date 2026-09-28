@@ -70,6 +70,23 @@ export function fetchLeaderboardHot(): Promise<MfunsApiEnvelope<HomeContentItem[
   })
 }
 
+/** 参考站 leaderboards.site → 全站排行首 Tab */
+export function fetchLeaderboardSite(): Promise<MfunsApiEnvelope<HomeContentItem[]>> {
+  return mfunsGet<HomeContentItem[]>('/leaderboards/site', {
+    type: HOME_LIST_TYPE,
+  })
+}
+
+/** 参考站 leaderboards.get → 分区排行 */
+export function fetchLeaderboardByCategory(
+  cid: number,
+): Promise<MfunsApiEnvelope<HomeContentItem[]>> {
+  return mfunsGet<HomeContentItem[]>('/leaderboards/get', {
+    cid,
+    type: HOME_LIST_TYPE,
+  })
+}
+
 export function homeContentPath(item: HomeContentItem): string {
   if (item.type === 1) return `/video/${item.id}`
   return `/article/${item.id}`

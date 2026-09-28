@@ -22,6 +22,7 @@ import { readMemberAuthState } from '../auth/memberSession'
 import type { MfunsAppBarConfig } from '../router/resolveAppBar'
 import { useTimelineTabs } from '../composables/useTimelineTabs'
 import { useHomeTabs } from '../composables/useHomeTabs'
+import { useLeaderboardTabs } from '../composables/useLeaderboardTabs'
 
 const props = defineProps<{
   config: MfunsAppBarConfig
@@ -38,7 +39,12 @@ const { isLoggedIn } = useMemberAuth()
 
 const { tabIndex: homeTabIndex } = useHomeTabs()
 const { tabIndex: timelineTabIndex, tabLabels: timelineTabLabels } = useTimelineTabs()
+const {
+  tabIndex: leaderboardTabIndex,
+  tabLabels: leaderboardTabLabels,
+} = useLeaderboardTabs()
 const backExtensionTabIndex = ref(0)
+const isLeaderboard = computed(() => route.path === '/leaderboard')
 const searchQuery = ref('')
 const createDialogOpen = ref(false)
 const createMenuOpen = ref(false)
@@ -287,6 +293,21 @@ async function confirmClearHistory() {
         </v-tab>
       </v-tabs>
       <v-tabs
+        v-else-if="isLeaderboard && showBackExtensionTabs"
+        v-model="leaderboardTabIndex"
+        color="white"
+        show-arrows
+        class="mfuns-home-tabs mfuns-home-tabs--extension mfuns-home-tabs--leaderboard"
+      >
+        <v-tab
+          v-for="(label, i) in leaderboardTabLabels"
+          :key="`lb-${i}-${label}`"
+          :value="i"
+        >
+          {{ label }}
+        </v-tab>
+      </v-tabs>
+      <v-tabs
         v-else-if="config.variant === 'back' && showBackExtensionTabs"
         v-model="backExtensionTabIndex"
         grow
@@ -376,6 +397,11 @@ async function confirmClearHistory() {
 }
 
 .mfuns-home-tabs--timeline {
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.mfuns-home-tabs--leaderboard {
   width: 100%;
   flex: 1 1 auto;
 }
