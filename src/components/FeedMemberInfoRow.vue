@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import MfunsBadge from './MfunsBadge.vue'
 import { mfunsImageUrl } from '../utils/mfunsImageUrl'
+
+const router = useRouter()
 
 export interface FeedMemberInfoData {
   id?: number
@@ -14,10 +17,15 @@ export interface FeedMemberInfoData {
   isAll?: boolean
 }
 
-const props = defineProps<{
-  data: FeedMemberInfoData
-  active?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    data: FeedMemberInfoData
+    active?: boolean
+    /** 点击头像/昵称跳转用户页 */
+    toUser?: boolean
+  }>(),
+  { active: false, toUser: false },
+)
 
 /** 与 useMemberProfile.displayBadgeIds：等级 + 佩戴徽章 */
 const displayBadgeIds = computed(() => {
@@ -38,6 +46,11 @@ function nameColorClass(raw: string | undefined): string | undefined {
 }
 
 const avatarSrc = () => mfunsImageUrl(props.data.avatar, 80)
+
+function goUser() {
+  if (!props.toUser || !props.data.id || props.data.isAll) return
+  router.push(`/member/${props.data.id}`)
+}
 </script>
 
 <template>
@@ -45,7 +58,11 @@ const avatarSrc = () => mfunsImageUrl(props.data.avatar, 80)
     class="feed-member-info d-flex align-center"
     :class="{ 'feed-member-info--active': active }"
   >
-    <div class="feed-member-info__avatar flex-shrink-0">
+    <div
+      class="feed-member-info__avatar flex-shrink-0"
+      :class="{ 'feed-member-info__avatar--link': toUser && data.id }"
+      @click="goUser"
+    >
       <v-avatar v-if="data.isAll" size="44" color="grey-lighten-3">
         <v-icon icon="mdi-account-group" size="24" />
       </v-avatar>
@@ -56,7 +73,14 @@ const avatarSrc = () => mfunsImageUrl(props.data.avatar, 80)
     </div>
     <div class="feed-member-info__content min-width-0 flex-grow-1">
       <div class="feed-member-info__title text-body-2">
-        <span class="feed-member-info__name" :class="nameColorClass(data.name_color)">
+        <span
+          class="feed-member-info__name"
+          :class="[
+            nameColorClass(data.name_color),
+            { 'feed-member-info__name--link': toUser && data.id },
+          ]"
+          @click="goUser"
+        >
           {{ data.name || '喵友' }}
         </span>
         <span v-if="displayBadgeIds.length" class="feed-member-info__badges d-inline-flex align-center">
@@ -71,6 +95,9 @@ const avatarSrc = () => mfunsImageUrl(props.data.avatar, 80)
       <div v-if="data.info" class="feed-member-info__subtitle text-caption text-medium-emphasis">
         {{ data.info }}
       </div>
+    </div>
+    <div v-if="$slots.default" class="feed-member-info__append flex-shrink-0 ms-2">
+      <slot />
     </div>
   </div>
 </template>
@@ -135,5 +162,15 @@ const avatarSrc = () => mfunsImageUrl(props.data.avatar, 80)
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.35;
+}
+
+.feed-member-info__avatar--link,
+.feed-member-info__name--link {
+  cursor: pointer;
+}
+
+.feed-member-info__append {
+  display: flex;
+  align-items: center;
 }
 </style>

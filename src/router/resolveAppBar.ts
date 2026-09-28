@@ -50,7 +50,12 @@ function backBar(
 
 /** Per-path app bar (from live m.mfuns.net SSR, static routes). */
 export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
-  if (path === '/premium' || path === '/create/video') {
+  if (
+    path === '/premium' ||
+    path === '/create/video' ||
+    path.startsWith('/feed/') ||
+    path.startsWith('/article/')
+  ) {
     return NO_BAR
   }
 

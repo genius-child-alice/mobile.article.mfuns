@@ -12,6 +12,8 @@ import MemberHistoryView from '../views/member/MemberHistoryView.vue'
 import MemberProfileView from '../views/member/MemberProfileView.vue'
 import TimelineView from '../views/timeline/TimelineView.vue'
 import HomeView from '../views/home/HomeView.vue'
+import FeedDetailView from '../views/feed/FeedDetailView.vue'
+import ArticleDetailView from '../views/article/ArticleDetailView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -77,6 +79,26 @@ export const router = createRouter({
       children: [
         { path: '', redirect: '/home' },
         ...childRoutes,
+        {
+          path: 'feed/:id',
+          name: 'feed-detail',
+          component: FeedDetailView,
+          meta: {
+            title: '动态详情',
+            showBottomNav: false,
+            shellStretchMain: true,
+          },
+        },
+        {
+          path: 'article/:id',
+          name: 'article-detail',
+          component: ArticleDetailView,
+          meta: {
+            title: '文章详情',
+            showBottomNav: false,
+            shellStretchMain: true,
+          },
+        },
         {
           path: ':pathMatch(.*)*',
           name: 'catch-all',
