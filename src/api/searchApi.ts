@@ -2,8 +2,14 @@ import { mfunsGet, type MfunsApiEnvelope } from './mfunsApi'
 import type { HomeContentItem } from './homeApi'
 import type { MemberUserInfo } from './memberUserApi'
 
+export interface SearchUserItem extends MemberUserInfo {
+  info?: string
+  /** 关注状态：0 未关注 / 1 已关注 / 2 互关 */
+  status?: number
+}
+
 export interface SearchUserData {
-  list?: MemberUserInfo[]
+  list?: SearchUserItem[]
 }
 
 export interface SearchResourceData {

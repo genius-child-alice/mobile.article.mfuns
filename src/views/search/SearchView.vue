@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ArticleContentBar from '../../components/ArticleContentBar.vue'
 import FeedMemberInfoRow from '../../components/FeedMemberInfoRow.vue'
+import SearchUserScroll from '../../components/SearchUserScroll.vue'
 import {
   filterHomeArticleItems,
   homeContentPath,
@@ -54,6 +55,10 @@ function toBarData(item: HomeContentItem): MemberHistoryResource {
 
 function isUserTab() {
   return tab.value === 2
+}
+
+function isAllTab() {
+  return tab.value === 0
 }
 
 async function loadResource(reset: boolean, type: SearchResourceType) {
@@ -187,6 +192,7 @@ onUnmounted(() => {
       <v-progress-linear v-if="loading" indeterminate color="primary" />
 
       <div v-if="!isUserTab()" class="pa-1 px-4">
+        <SearchUserScroll v-if="isAllTab()" :search="activeSearch" />
         <ArticleContentBar
           v-for="item in resourceList"
           :key="item.id"
