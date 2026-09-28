@@ -24,6 +24,14 @@ export interface HomeContentItem {
   exposure_id?: string
 }
 
+export const HOME_CONTENT_TYPE_ARTICLE = 0
+export const HOME_CONTENT_TYPE_VIDEO = 1
+
+/** 排行/推荐等列表在前端剔除视频（接口仍可能混入 type=1） */
+export function filterHomeArticleItems(items: HomeContentItem[]): HomeContentItem[] {
+  return items.filter((item) => item.type !== HOME_CONTENT_TYPE_VIDEO)
+}
+
 export interface HomeRecommendData {
   list?: HomeContentItem[]
 }

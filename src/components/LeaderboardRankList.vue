@@ -5,6 +5,7 @@ import ArticleContentBar from './ArticleContentBar.vue'
 import {
   fetchLeaderboardByCategory,
   fetchLeaderboardSite,
+  filterHomeArticleItems,
   homeContentPath,
   type HomeCategory,
   type HomeContentItem,
@@ -47,7 +48,7 @@ async function load() {
         ? await fetchLeaderboardByCategory(props.cate.id)
         : null
     if (res && res.code === 1 && Array.isArray(res.data)) {
-      list.value = res.data
+      list.value = filterHomeArticleItems(res.data)
     } else {
       list.value = []
     }
