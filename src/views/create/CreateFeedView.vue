@@ -129,7 +129,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="create-feed-page">
+  <div class="create-feed-page create-shell-page">
     <!-- 参考站：cols 12 md8 offset-md2 lg6 offset-lg3 -->
     <v-container class="create-feed-page__container pt-0 pt-sm-1" fluid>
       <v-row>

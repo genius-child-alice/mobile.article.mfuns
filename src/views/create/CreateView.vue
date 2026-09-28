@@ -166,7 +166,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="create-page">
+  <div class="create-page create-shell-page">
     <!-- 参考 Container：pt-0 pt-sm-1，xs 时 pa-0，max-width 1400 -->
     <v-container
       class="create-page__container pt-0 pt-sm-1"
@@ -230,7 +230,7 @@ onMounted(() => {
               </div>
 
               <!-- 桌面：右侧操作同一行（参考 ContentInfoListItem 横向按钮） -->
-              <div v-if="!mobile" class="create-page__actions d-flex flex-row flex-nowrap align-center ga-2">
+              <div v-if="!mobile" class="create-page__actions d-flex flex-row flex-nowrap align-start ga-2">
                 <v-btn variant="outlined" color="link" @click="editItem(item)">
                   <v-icon start icon="mdi-circle-edit-outline" />
                   编辑
@@ -347,7 +347,7 @@ onMounted(() => {
 .create-page__actions {
   flex-shrink: 0;
   margin-left: 8px;
-  align-self: center;
+  align-self: flex-start;
 }
 
 .create-page__fab {

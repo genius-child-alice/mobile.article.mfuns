@@ -99,6 +99,12 @@ html.mfuns-theme-dark .background-image {
   text-decoration: none;
 }
 
+/* 创作页：铺满主区，底色与文章卡片 / v-sheet surface 一致（浅色白、深色 #1e1e1e） */
+.create-shell-page {
+  background-color: rgb(var(--v-theme-surface));
+  min-height: 100%;
+}
+
 .link--text:hover {
   text-decoration: underline;
 }

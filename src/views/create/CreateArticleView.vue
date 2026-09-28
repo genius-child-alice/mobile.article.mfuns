@@ -270,7 +270,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="create-article-page">
+  <div class="create-article-page create-shell-page">
     <v-container class="create-article-page__container pt-0 pt-sm-1" fluid>
       <v-row>
         <!-- 主栏：标题 + 编辑器 -->
