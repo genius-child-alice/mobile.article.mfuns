@@ -65,6 +65,56 @@ export function fetchFavoriteInfo(
   )
 }
 
+/** 收藏夹内单条内容（结构对齐 ContentBar / 历史 resource） */
+export interface FavoriteContentItem {
+  id?: number
+  favorite_id?: number
+  /** 资源类型：0=文章 */
+  type?: number
+  resource_type?: number
+  title?: string
+  cover?: string
+  summary?: string
+  user?: { name?: string }
+  like_count?: number
+  comment_count?: number
+  view_count?: number
+  duration?: number
+  tag?: string[]
+  resource_info?: {
+    id?: number
+    type?: number
+    title?: string
+    cover?: string
+    summary?: string
+    user?: { name?: string }
+    like_count?: number
+    comment_count?: number
+    view_count?: number
+    duration?: number
+    tag?: string[]
+  }
+}
+
+export function fetchFavoriteItems(
+  favoriteId: number,
+  lastId = 0,
+  token?: string | null,
+): Promise<MfunsApiEnvelope<{ list?: FavoriteContentItem[] }>> {
+  return mfunsGet(
+    '/favorite/get_favorite_item',
+    { favorite_id: favoriteId, last_id: lastId > 0 ? lastId : undefined },
+    token,
+  )
+}
+
+export function removeFavoriteItem(
+  itemId: number,
+  token: string,
+): Promise<MfunsApiEnvelope<unknown>> {
+  return mfunsPost('/favorite/remove_favorite', { item_id: itemId }, token)
+}
+
 export function fetchIsFavorite(
   resourceId: number,
   resourceType: number,

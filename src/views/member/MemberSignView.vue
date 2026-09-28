@@ -16,7 +16,7 @@ const router = useRouter()
 const { isLoggedIn } = useMemberAuth()
 
 const time = ref<Array<number | ''>>([])
-const sign = ref<Record<string | number, number>>({})
+const sign = ref<Record<string | number, number | string>>({})
 const isSign = ref(false)
 const loading = ref(false)
 const dialog = ref(false)
@@ -27,6 +27,17 @@ const accumulated = ref<{ day: string; content: string }[]>([])
 const snackbar = ref({ open: false, text: '', color: 'success' as string })
 
 const getDate = computed(() => new Date().getDate())
+
+/** 按周分行，对齐参考站 table + tr */
+const weekRows = computed(() => {
+  const rows: Array<Array<number | ''>> = []
+  for (let i = 0; i < time.value.length; i += 7) {
+    const row = time.value.slice(i, i + 7)
+    while (row.length < 7) row.push('')
+    rows.push(row)
+  }
+  return rows
+})
 
 function toast(text: string, color = 'success') {
   snackbar.value = { open: true, text, color }
@@ -54,20 +65,24 @@ function buildDayList(): Array<number | ''> {
   return cells
 }
 
+/** 参考站：1==this.sign[t]（兼容字符串 "1"） */
 function getIsSign(day: number | '' = getDate.value): boolean {
   if (day === '') return false
-  return sign.value[day] === 1
+  return Number(sign.value[day]) === 1
 }
 
-function cellColor(day: number | ''): string {
-  if (day === '') return 'transparent'
-  if (getIsSign(day)) return 'green'
-  if (day <= getDate.value) return 'rgba(0,0,0,0.4)'
-  return 'rgba(0,0,0,0.1)'
+/** 参考站 getColor：已签用主题 green；其余用 rgba 背景 */
+function daySheetStyle(day: number | ''): Record<string, string> | undefined {
+  if (day === '' || getIsSign(day)) return undefined
+  const bg = day <= getDate.value ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)'
+  return {
+    background: bg,
+    color: day <= getDate.value ? '#fff' : 'inherit',
+  }
 }
 
-function cellDark(day: number | ''): boolean {
-  return day !== '' && day <= getDate.value
+function dayIsDark(day: number | ''): boolean {
+  return day !== '' && (getIsSign(day) || day <= getDate.value)
 }
 
 async function refresh() {
@@ -143,7 +158,7 @@ onMounted(async () => {
 <template>
   <div class="member-sign-page">
     <v-container class="py-3" style="max-width: 720px">
-      <v-card class="mb-3" elevation="1">
+      <v-card>
         <v-card-text class="d-flex align-center justify-space-between">
           <div>累计签到 {{ signAllDay }} 天</div>
           <v-btn
@@ -158,41 +173,49 @@ onMounted(async () => {
         </v-card-text>
       </v-card>
 
-      <v-card class="mb-3" elevation="1">
-        <v-card-title class="text-body-1">签到记录</v-card-title>
-        <v-card-subtitle>本月累计 {{ signDay }} 天</v-card-subtitle>
-        <v-card-text>
-          <div class="member-sign-page__week">
-            <div v-for="w in WEEK_LABELS" :key="w" class="member-sign-page__week-label">
-              {{ w }}
-            </div>
-          </div>
-          <div class="member-sign-page__table">
-            <button
-              v-for="(day, idx) in time"
-              :key="idx"
-              type="button"
-              class="member-sign-page__cell"
-              :class="{
-                'member-sign-page__cell--today': day === getDate,
-                'member-sign-page__cell--empty': day === '',
-              }"
-              :style="{
-                background: cellColor(day),
-                color: cellDark(day) ? '#fff' : undefined,
-              }"
-              :disabled="day === ''"
-              @click="askSignAgain(day)"
-            >
-              {{ day }}
-            </button>
-          </div>
+      <v-card class="mt-2">
+        <v-card-subtitle class="d-flex">
+          签到记录
+          <v-spacer />
+          本月累计签到&nbsp;
+          <span class="link--text font-weight-black">{{ signDay }}</span>
+          &nbsp;天
+        </v-card-subtitle>
+        <v-card-text class="d-flex">
+          <table class="member-sign-page__table text-center text-body-1">
+            <thead>
+              <tr>
+                <td v-for="w in WEEK_LABELS" :key="w">{{ w }}</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, ri) in weekRows" :key="ri">
+                <td
+                  v-for="(day, di) in row"
+                  :key="di"
+                  :class="{ 'today-border': day === getDate }"
+                >
+                  <v-sheet
+                    v-if="day !== ''"
+                    class="member-sign-page__day"
+                    :color="getIsSign(day) ? 'green' : undefined"
+                    :style="daySheetStyle(day)"
+                    :theme="dayIsDark(day) ? 'dark' : undefined"
+                    v-ripple
+                    @click="askSignAgain(day)"
+                  >
+                    {{ day }}
+                  </v-sheet>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </v-card-text>
       </v-card>
 
-      <v-card elevation="1">
-        <v-card-title class="text-body-1">本月累计签到奖励</v-card-title>
-        <v-list density="compact">
+      <v-card class="mt-2">
+        <v-card-subtitle class="d-flex">本月累计签到奖励</v-card-subtitle>
+        <v-list>
           <v-list-item
             v-for="item in accumulated"
             :key="item.day"
@@ -201,11 +224,12 @@ onMounted(async () => {
           >
             <template #append>
               <span
-                class="text-caption"
-                :class="Number(item.day) <= signDay ? 'text-success' : 'text-medium-emphasis'"
+                v-if="Number(item.day) <= signDay"
+                class="link--text text-caption"
               >
-                {{ Number(item.day) <= signDay ? '✔已领取' : '未达到要求' }}
+                ✔已领取
               </span>
+              <span v-else class="text-caption text-medium-emphasis">未达到要求</span>
             </template>
           </v-list-item>
           <div
@@ -239,37 +263,27 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.member-sign-page__week,
 .member-sign-page__table {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 6px;
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  flex-grow: 1;
 }
 
-.member-sign-page__week {
-  margin-bottom: 8px;
-}
-
-.member-sign-page__week-label {
+.member-sign-page__table tbody td :deep(.v-sheet),
+.member-sign-page__day {
+  border-radius: 3px;
+  padding: 10px 0;
   text-align: center;
-  font-size: 12px;
-  color: rgba(var(--v-theme-on-surface), 0.6);
-}
-
-.member-sign-page__cell {
-  aspect-ratio: 1;
-  border: 0;
-  border-radius: 4px;
-  font-size: 13px;
   cursor: pointer;
 }
 
-.member-sign-page__cell--empty {
-  cursor: default;
-  background: transparent !important;
+.member-sign-page__table tr td {
+  padding: 3px;
 }
 
-.member-sign-page__cell--today {
-  box-shadow: inset 0 0 0 2px #4caf50;
+.member-sign-page__table .today-border {
+  border: 1px solid #4caf50;
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useDisplay } from 'vuetify'
 import {
   fetchBlackRoomList,
   fetchBlackRoomMyList,
@@ -14,6 +15,7 @@ import { useMemberProfile } from '../../composables/useMemberProfile'
 import { formatRelativeUnixTime } from '../../utils/mfunsTime'
 import { mfunsImageUrl } from '../../utils/mfunsImageUrl'
 
+const { xs } = useDisplay()
 const { isLoggedIn } = useMemberAuth()
 const { memberInfo, refreshMemberProfile } = useMemberProfile()
 
@@ -70,69 +72,83 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="blackroom-page">
+  <div class="blackroom-page background">
     <v-progress-linear v-if="loading" indeterminate color="primary" />
 
-    <template v-else>
-      <v-container class="py-3" style="max-width: 960px">
-        <v-sheet class="blackroom-page__credit pa-4 mb-4" rounded="lg" elevation="1">
-          <div class="d-flex align-center">
-            <v-avatar size="48" color="grey-lighten-2">
+    <v-container
+      v-else
+      class="blackroom-page__container pt-0 pt-sm-1"
+      :class="{ 'pa-0': xs }"
+    >
+      <!-- 信誉卡：对齐参考站 v-sheet > card-text + divider + 双列 -->
+      <v-sheet class="mb-2" color="surface">
+        <v-card-text class="d-flex pa-6">
+          <div>
+            <v-avatar color="primary" :size="40" class="mt-1">
               <v-img v-if="isLoggedIn && avatarSrc" :src="avatarSrc" cover />
               <v-icon v-else icon="mdi-account" />
             </v-avatar>
-            <div class="ms-3 min-width-0">
-              <div class="text-subtitle-1 text-truncate">
-                {{ memberInfo?.name || (isLoggedIn ? '个人资料' : '未登录') }}
-              </div>
-              <div class="text-body-2">账户评价：{{ userInfo }}</div>
-            </div>
           </div>
-          <div class="d-flex mt-4 text-body-2">
-            <div class="flex-grow-1">
-              当前信誉值
-              <div class="text-h6">{{ myList.credits ?? '—' }}</div>
+          <div class="pl-2">
+            <div class="text-h6">
+              {{ memberInfo?.name || (isLoggedIn ? '个人资料' : '未登录') }}
             </div>
-            <div class="flex-grow-1">
-              账户封禁次数
-              <div class="text-h6">{{ myList.count ?? '—' }}</div>
-            </div>
+            <div class="text-medium-emphasis">账户评价：{{ userInfo }}</div>
           </div>
-        </v-sheet>
+        </v-card-text>
+        <v-divider />
+        <v-card-text class="d-flex justify-space-around">
+          <div class="text-medium-emphasis">
+            当前信誉值：
+            <span class="link--text text-body-1">{{ myList.credits ?? '—' }}</span>
+          </div>
+          <v-divider vertical />
+          <div class="text-medium-emphasis">
+            账户封禁次数：
+            <span class="link--text text-body-1">{{ myList.count ?? '—' }}</span>
+          </div>
+        </v-card-text>
+      </v-sheet>
 
-        <div v-if="list.length === 0" class="text-center text-medium-emphasis py-10">
-          暂无封禁记录
-        </div>
+      <div v-if="list.length === 0" class="text-center text-medium-emphasis py-10">
+        暂无封禁记录
+      </div>
 
-        <v-row dense>
-          <v-col v-for="(item, index) in list" :key="item.info?.id ?? index" cols="12" md="6">
-            <v-sheet class="blackroom-page__card pa-3 mb-2" rounded="lg" elevation="1">
+      <v-row v-else dense>
+        <v-col
+          v-for="(item, index) in list"
+          :key="item.info?.id ?? index"
+          cols="12"
+        >
+          <v-sheet color="surface">
+            <!-- px-4 = 16px，与 v-card-text 默认左右内边距一致 -->
+            <div class="px-4">
               <FeedMemberInfoRow :data="cardMember(item)" to-user />
-              <div class="mt-2">
-                <MfunsRichText :text="item.info?.info" :type="1" :max-line="10" />
-              </div>
-            </v-sheet>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
+            </div>
+            <v-card-text>
+              <MfunsRichText :text="item.info?.info" :type="1" :max-line="10" />
+            </v-card-text>
+          </v-sheet>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
 <style scoped>
-.blackroom-page {
-  background: #eceff1;
+.blackroom-page.background {
+  background-color: #eceff1;
+  min-height: 100%;
   min-height: calc(
     100dvh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px)
   );
 }
 
-html.mfuns-theme-dark .blackroom-page {
-  background: rgb(var(--v-theme-background));
+html.mfuns-theme-dark .blackroom-page.background {
+  background-color: rgb(var(--v-theme-background));
 }
 
-.blackroom-page__credit,
-.blackroom-page__card {
-  background: rgb(var(--v-theme-surface));
+.blackroom-page__container {
+  max-width: 1400px;
 }
 </style>
