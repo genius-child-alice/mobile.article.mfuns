@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import CreateMemberSelectDialog, { type MentionUser } from './CreateMemberSelectDialog.vue'
 import MediaLibrary from './MediaLibrary.vue'
 
 const props = withDefaults(
@@ -26,7 +27,10 @@ const emit = defineEmits<{
 
 const editorRef = ref<HTMLElement | null>(null)
 const mediaRef = ref<InstanceType<typeof MediaLibrary> | null>(null)
+const memberOpen = ref(false)
 let syncing = false
+/** 打开选人前保存的选区，插入 mention 用 */
+let savedRange: Range | null = null
 
 const count = computed(() => {
   const d = document.createElement('div')
@@ -60,6 +64,12 @@ function exec(cmd: string, value?: string) {
 
 function insertHtml(html: string) {
   editorRef.value?.focus()
+  if (savedRange) {
+    const sel = window.getSelection()
+    sel?.removeAllRanges()
+    sel?.addRange(savedRange)
+    savedRange = null
+  }
   document.execCommand('insertHTML', false, html)
   emitContent()
 }
@@ -72,15 +82,36 @@ function insertImage(path: string) {
 }
 
 function openMedia() {
+  saveSelection()
   mediaRef.value?.open('select', 1)
 }
 
-function insertAt() {
-  insertHtml('<span class="mention">@</span>&nbsp;')
+function saveSelection() {
+  const sel = window.getSelection()
+  if (sel && sel.rangeCount > 0 && editorRef.value?.contains(sel.anchorNode)) {
+    savedRange = sel.getRangeAt(0).cloneRange()
+  } else {
+    savedRange = null
+  }
+}
+
+function openMemberSelect() {
+  saveSelection()
+  memberOpen.value = true
+}
+
+/** 参考 Quill mention blot：span.mention[data-id][data-value] → @name */
+function insertMention(user: MentionUser) {
+  const name = (user.name || '').replace(/[<>&"]/g, '')
+  const id = user.id
+  if (!id || !name) return
+  const html =
+    `<span class="mention" data-id="${id}" data-value="${name}" contenteditable="false">@${name}</span>\u00a0`
+  insertHtml(html)
 }
 
 function insertEmoji() {
-  // 参考站有完整表情面板；此处插入常用表情占位，保持工具栏布局一致
+  saveSelection()
   insertHtml('😊')
 }
 
@@ -103,7 +134,7 @@ defineExpose({ getContent, setContent })
 </script>
 
 <template>
-  <!-- 参考 ArticleEditor：编辑区 → 字数 → 底栏工具条 -->
+  <!-- 参考 ArticleEditor：编辑区 → 字数 → 底栏工具条；@ 打开 MemberSelect（动态/文章相同） -->
   <div class="create-rich-editor">
     <div
       ref="editorRef"
@@ -125,7 +156,7 @@ defineExpose({ getContent, setContent })
       <v-btn icon variant="text" size="small" @click="insertEmoji">
         <v-icon icon="mdi-emoticon-outline" />
       </v-btn>
-      <v-btn icon variant="text" size="small" @click="insertAt">
+      <v-btn icon variant="text" size="small" @click="openMemberSelect">
         <v-icon icon="mdi-at" />
       </v-btn>
       <v-btn v-if="!limit" icon variant="text" size="small" @click="openMedia">
@@ -174,6 +205,7 @@ defineExpose({ getContent, setContent })
       </template>
     </div>
     <MediaLibrary v-if="!limit" ref="mediaRef" title="插入图片" @select="insertImage" />
+    <CreateMemberSelectDialog v-model="memberOpen" @select="insertMention" />
   </div>
 </template>
 
@@ -197,5 +229,7 @@ defineExpose({ getContent, setContent })
 
 .create-rich-editor__body :deep(.mention) {
   color: rgb(var(--v-theme-link));
+  cursor: default;
+  white-space: nowrap;
 }
 </style>
