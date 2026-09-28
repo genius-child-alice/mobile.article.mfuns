@@ -46,7 +46,7 @@ function goResource() {
 <template>
   <!-- 参考 NotifyCard：MemberInfo + 灰底正文 + divider -->
   <div class="notify-card" style="max-width: 100vw">
-    <v-sheet v-ripple class="pb-2" @click="goResource">
+    <v-sheet v-ripple class="px-3 py-2" @click="goResource">
       <div @click.stop>
         <FeedMemberInfoRow :data="memberData" to-user>
           <span class="text-medium-emphasis text-caption">{{ timeLabel }}</span>
