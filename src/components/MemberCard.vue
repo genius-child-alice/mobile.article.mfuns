@@ -50,7 +50,7 @@ function goFollow(type: 'follow' | 'fans') {
       <template v-if="smAndUp" #placeholder>
         <div class="member-card__banner-placeholder" />
       </template>
-      <div v-if="smAndUp" class="member-card__banner-overlay pa-4">
+      <div v-if="smAndUp" class="member-card__banner-strip">
         <div class="text-h5 text-white">
           <span class="font-weight-bold" :class="nameColorClass(user.name_color)">
             {{ user.name }}
@@ -77,8 +77,14 @@ function goFollow(type: 'follow' | 'fans') {
       </div>
     </v-img>
 
-    <div class="member-card__body" :class="{ 'member-card__body--mobile': !smAndUp }">
-      <div class="member-card__avatar-wrap">
+    <div
+      class="member-card__body"
+      :class="{
+        'member-card__body--mobile': !smAndUp,
+        'member-card__body--wide': smAndUp,
+      }"
+    >
+      <div :class="smAndUp ? 'member-card__avatar-fill' : 'member-card__avatar-mini'">
         <v-avatar :size="smAndUp ? 112 : 88" color="white" elevation="1">
           <v-img v-if="avatarSrc" :src="avatarSrc" cover />
           <v-icon v-else icon="mdi-account" size="40" />
@@ -105,7 +111,11 @@ function goFollow(type: 'follow' | 'fans') {
         </div>
       </v-container>
 
-      <v-container fluid class="member-card__bio pt-2">
+      <v-container
+        fluid
+        class="member-card__bio"
+        :class="{ 'member-card__bio--wide': smAndUp }"
+      >
         <div v-if="user.bio" class="text-body-2 text-pre-wrap">{{ user.bio }}</div>
         <div v-else class="text-body-2 text-medium-emphasis">这个人很懒，还没有写签名呢~</div>
       </v-container>
@@ -120,13 +130,18 @@ function goFollow(type: 'follow' | 'fans') {
   background: rgba(var(--v-theme-on-surface), 0.08);
 }
 
-.member-card__banner-overlay {
+/* 参考 user-banner-image-color：底部信息条，左侧留给头像 */
+.member-card__banner-strip {
   position: absolute;
-  inset: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  padding-left: 140px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.55));
+  justify-content: center;
+  background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
 }
 
 .member-card__body {
@@ -137,12 +152,31 @@ function goFollow(type: 'follow' | 'fans') {
   padding-top: 44px;
 }
 
-.member-card__avatar-wrap {
+/* 头像 bottom = -80 + 112 = 32px；简介底边与之对齐 */
+.member-card__body--wide {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 32px;
+  padding-left: 140px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.member-card__avatar-fill {
   position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: -80px;
+  left: 16px;
   z-index: 1;
+}
+
+.member-card__avatar-mini {
+  position: absolute;
+  top: -44px;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
 }
 
 .member-card__stats {
@@ -159,5 +193,10 @@ function goFollow(type: 'follow' | 'fans') {
 
 .member-card__bio {
   padding-top: 8px;
+}
+
+.member-card__bio--wide {
+  width: 100%;
+  padding: 0 12px 0 0 !important;
 }
 </style>
