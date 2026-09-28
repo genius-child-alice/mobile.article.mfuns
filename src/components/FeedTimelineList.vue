@@ -117,12 +117,10 @@ defineExpose({ reload: () => load(true) })
       暂无动态
     </div>
 
-    <FeedDynamicCard
-      v-for="item in list"
-      :key="item.id"
-      class="mb-2"
-      :data="item"
-    />
+    <template v-for="(item, index) in list" :key="item.id">
+      <FeedDynamicCard :data="item" />
+      <v-divider v-if="index < list.length - 1" class="my-0" />
+    </template>
 
     <div v-if="!loading && list.length > 0 && !notMore" class="py-3 text-center">
       <v-btn variant="text" color="link" :loading="loadingMore" @click="load()">

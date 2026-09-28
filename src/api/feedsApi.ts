@@ -21,6 +21,18 @@ export interface FeedUser {
   fans?: number
 }
 
+export interface FeedExtraResource {
+  id?: number
+  title?: string
+  content?: string
+  content_type?: number
+  created_at?: number
+  device?: string | number
+  cover?: string
+  summary?: string
+  extra?: { images?: string[] }
+}
+
 export interface FeedExtra {
   images?: string[]
   view_type?: string
@@ -31,6 +43,7 @@ export interface FeedExtra {
   resource_id?: number
   resource_type?: number
   user?: FeedUser
+  resource?: FeedExtraResource
   [key: string]: unknown
 }
 
@@ -38,6 +51,7 @@ export interface FeedItem {
   id: number
   user_id?: number
   content?: string
+  title?: string
   content_type?: number
   created_at?: number
   updated_at?: number
