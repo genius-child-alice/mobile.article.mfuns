@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
-import { useRouter } from 'vue-router'
 import { fetchMessageList, type MessageThreadItem } from '../../api/messageApi'
 import { readMemberAuthState } from '../../auth/memberSession'
 import FeedMemberInfoRow from '../../components/FeedMemberInfoRow.vue'
@@ -9,6 +9,7 @@ import { useMemberAuth } from '../../composables/useMemberAuth'
 import { refreshNotifyCount, useNotifyCount } from '../../composables/useNotifyCount'
 import { formatRelativeUnixTime } from '../../utils/mfunsTime'
 
+const route = useRoute()
 const router = useRouter()
 const { mdAndUp } = useDisplay()
 const { isLoggedIn } = useMemberAuth()
@@ -17,6 +18,15 @@ const { counts } = useNotifyCount()
 const list = ref<MessageThreadItem[]>([])
 const loading = ref(true)
 let pollTimer: ReturnType<typeof setInterval> | null = null
+
+/** 当前是否在消息子页（提及/点赞/通知/私信等） */
+const hasChild = computed(() => route.path !== '/message' && route.path.startsWith('/message/'))
+
+/** 横板始终显示列表；竖屏仅在消息中心首页显示列表 */
+const showList = computed(() => mdAndUp.value || !hasChild.value)
+
+/** 横板始终显示右侧内容区；竖屏进入子页时全宽显示子页 */
+const showContent = computed(() => mdAndUp.value || hasChild.value)
 
 const shortcuts = computed(() => [
   {
@@ -92,6 +102,15 @@ function go(path: string) {
   router.push(path)
 }
 
+function isShortcutActive(to: string) {
+  return route.path === to
+}
+
+function isThreadActive(uid: number | undefined) {
+  if (!uid) return false
+  return route.path === `/message/${uid}`
+}
+
 onMounted(() => {
   if (!isLoggedIn.value) {
     router.replace('/member/login')
@@ -109,10 +128,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- 参考 MessageList：左侧消息栏（移动端全宽） -->
+  <!-- 参考 MessageList：左侧消息栏 + 右侧 nuxt-child -->
   <div class="message-page background-image">
     <div class="message-container">
-      <div class="message-list" :class="{ fill: !mdAndUp }">
+      <div v-show="showList" class="message-list" :class="{ fill: !mdAndUp }">
         <v-card class="message-list-bar" elevation="0">
           <v-card-text>
             <v-row class="text-center" dense>
@@ -122,6 +141,7 @@ onUnmounted(() => {
                 cols="3"
                 v-ripple
                 class="message-page__shortcut"
+                :class="{ 'message-page__shortcut--active': isShortcutActive(item.to) }"
                 @click="go(item.to)"
               >
                 <v-badge
@@ -152,6 +172,7 @@ onUnmounted(() => {
               <div
                 v-ripple
                 class="message-page__thread px-2"
+                :class="{ 'message-page__thread--active': isThreadActive(item.user?.id) }"
                 @click="openThread(item)"
               >
                 <FeedMemberInfoRow
@@ -183,9 +204,24 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- md+：右侧子页占位（参考 nuxt-child） -->
-      <div v-if="mdAndUp" class="message-content d-flex align-center justify-center text-medium-emphasis">
-        选择一项消息查看
+      <!-- md+：右侧子页；竖屏进入子页时全宽 -->
+      <div
+        v-if="showContent"
+        class="message-content"
+        :class="{
+          'message-content--pane': mdAndUp,
+          'message-content--fill': !mdAndUp,
+        }"
+      >
+        <RouterView v-slot="{ Component }">
+          <component :is="Component" v-if="Component" class="message-content__view" />
+          <div
+            v-else-if="mdAndUp"
+            class="message-content__placeholder d-flex align-center justify-center text-medium-emphasis"
+          >
+            选择一项消息查看
+          </div>
+        </RouterView>
       </div>
     </div>
   </div>
@@ -232,14 +268,44 @@ onUnmounted(() => {
 .message-content {
   flex: 1;
   height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-content--fill {
+  width: 100%;
+}
+
+.message-content__view {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.message-content__placeholder {
+  flex: 1;
+  width: 100%;
+  height: 100%;
 }
 
 .message-page__shortcut {
   cursor: pointer;
+  border-radius: 8px;
+}
+
+.message-page__shortcut--active {
+  background: rgba(var(--v-theme-primary), 0.08);
 }
 
 .message-page__thread {
   cursor: pointer;
+}
+
+.message-page__thread--active {
+  background: rgba(var(--v-theme-primary), 0.08);
 }
 
 .message-page__empty {

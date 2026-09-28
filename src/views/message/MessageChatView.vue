@@ -269,10 +269,8 @@ onUnmounted(() => {
 .message-window {
   position: relative;
   width: 100%;
-  height: calc(
-    100vh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
-      env(safe-area-inset-bottom, 0px)
-  );
+  height: 100%;
+  min-height: 0;
 }
 
 .message-window__loading {

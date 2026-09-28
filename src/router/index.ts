@@ -52,10 +52,6 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/playlist/mylist': PlaylistMyListView,
   '/blackroom': BlackroomView,
   '/leaderboard': LeaderboardView,
-  '/message': MessageView,
-  '/message/mention': MessageMentionView,
-  '/message/like': MessageLikeView,
-  '/message/notify': MessageNotifyView,
   '/create': CreateView,
   '/create/article': CreateArticleView,
   '/create/feed': CreateFeedView,
@@ -104,19 +100,41 @@ const shellStretchMainPaths = new Set([
   '/member/reset_password',
 ])
 
-const childRoutes = STATIC_PAGE_PATHS.map((path) => {
-  const segment = path.replace(/^\//, '')
+/** 消息中心子页由 MessageView 嵌套渲染（横板右侧 message-content） */
+const MESSAGE_NESTED_PATHS = new Set([
+  '/message',
+  '/message/comment',
+  '/message/like',
+  '/message/mention',
+  '/message/notify',
+  '/message/list',
+])
+
+function pageMeta(path: string) {
   return {
-    path: segment,
-    name: pathToRouteName(path),
-    component: routeComponents[path] ?? RoutePlaceholder,
-    meta: {
-      title: pathToTitle(path),
-      showBottomNav: mainTabSet.has(path),
-      shellFullBleed: shellFullBleedPaths.has(path),
-      shellStretchMain: shellStretchMainPaths.has(path),
-    },
+    title: pathToTitle(path),
+    showBottomNav: mainTabSet.has(path),
+    shellFullBleed: shellFullBleedPaths.has(path),
+    shellStretchMain: shellStretchMainPaths.has(path),
   }
+}
+
+const childRoutes = STATIC_PAGE_PATHS.filter((path) => !MESSAGE_NESTED_PATHS.has(path)).map(
+  (path) => {
+    const segment = path.replace(/^\//, '')
+    return {
+      path: segment,
+      name: pathToRouteName(path),
+      component: routeComponents[path] ?? RoutePlaceholder,
+      meta: pageMeta(path),
+    }
+  },
+)
+
+const messageChildMeta = (path: string) => ({
+  title: pathToTitle(path),
+  showBottomNav: false,
+  shellFullBleed: true,
 })
 
 export const router = createRouter({
@@ -128,6 +146,58 @@ export const router = createRouter({
       children: [
         { path: '', redirect: '/home' },
         ...childRoutes,
+        {
+          path: 'message',
+          name: pathToRouteName('/message'),
+          component: MessageView,
+          meta: pageMeta('/message'),
+          children: [
+            {
+              path: 'mention',
+              name: pathToRouteName('/message/mention'),
+              component: MessageMentionView,
+              meta: messageChildMeta('/message/mention'),
+            },
+            {
+              path: 'like',
+              name: pathToRouteName('/message/like'),
+              component: MessageLikeView,
+              meta: messageChildMeta('/message/like'),
+            },
+            {
+              path: 'notify',
+              name: pathToRouteName('/message/notify'),
+              component: MessageNotifyView,
+              meta: messageChildMeta('/message/notify'),
+            },
+            {
+              path: 'comment',
+              name: pathToRouteName('/message/comment'),
+              component: RoutePlaceholder,
+              meta: messageChildMeta('/message/comment'),
+            },
+            {
+              path: 'list',
+              name: pathToRouteName('/message/list'),
+              component: RoutePlaceholder,
+              meta: messageChildMeta('/message/list'),
+            },
+            {
+              path: ':uid(\\d+)',
+              name: 'message-chat',
+              component: MessageChatView,
+              meta: {
+                title: '私信',
+                showBottomNav: false,
+                shellFullBleed: true,
+              },
+            },
+          ],
+        },
+        {
+          path: 'message/chat/:uid',
+          redirect: (to) => `/message/${to.params.uid}`,
+        },
         {
           path: 'feed/:id',
           name: 'feed-detail',
@@ -157,20 +227,6 @@ export const router = createRouter({
             showBottomNav: false,
             shellStretchMain: true,
           },
-        },
-        {
-          path: 'message/:uid(\\d+)',
-          name: 'message-chat',
-          component: MessageChatView,
-          meta: {
-            title: '私信',
-            showBottomNav: false,
-            shellFullBleed: true,
-          },
-        },
-        {
-          path: 'message/chat/:uid',
-          redirect: (to) => `/message/${to.params.uid}`,
         },
         {
           path: ':pathMatch(.*)*',
