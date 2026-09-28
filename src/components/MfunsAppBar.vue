@@ -25,6 +25,12 @@ import { useHomeTabs } from '../composables/useHomeTabs'
 import { useLeaderboardTabs } from '../composables/useLeaderboardTabs'
 import { useNotifyCount } from '../composables/useNotifyCount'
 import { useMessageChatTitle } from '../composables/useMessageChatTitle'
+import { triggerBadgeSave } from '../composables/useBadgeSave'
+import {
+  clearSearchState,
+  submitSearchInput,
+  useSearchBar,
+} from '../composables/useSearchBar'
 
 const props = defineProps<{
   config: MfunsAppBarConfig
@@ -47,7 +53,7 @@ const {
 } = useLeaderboardTabs()
 const backExtensionTabIndex = ref(0)
 const isLeaderboard = computed(() => route.path === '/leaderboard')
-const searchQuery = ref('')
+const { query: searchQuery } = useSearchBar()
 const createDialogOpen = ref(false)
 const createMenuOpen = ref(false)
 
@@ -72,6 +78,17 @@ const pageTitle = computed(() => {
 function goBack() {
   if (window.history.length > 1) router.back()
   else router.push('/home')
+}
+
+function onSearchSubmit() {
+  submitSearchInput(searchQuery.value, (path) => {
+    router.push(path)
+  })
+}
+
+function onSearchCancel() {
+  clearSearchState()
+  goBack()
 }
 
 async function confirmClearHistory() {
@@ -189,8 +206,11 @@ async function confirmClearHistory() {
           bg-color="rgba(255,255,255,0.15)"
           color="white"
           base-color="white"
+          @keyup.enter="onSearchSubmit"
         />
-        <v-btn variant="text" color="white" class="mfuns-search-cancel" @click="goBack"> 取消 </v-btn>
+        <v-btn variant="text" color="white" class="mfuns-search-cancel" @click="onSearchCancel">
+          取消
+        </v-btn>
       </div>
 
       <!-- member 个人中心 -->
@@ -279,6 +299,14 @@ async function confirmClearHistory() {
           :to="{ path: '/member/sign_rank' }"
         >
           排行榜
+        </v-btn>
+        <v-btn
+          v-else-if="config.trailing === 'badges-save'"
+          variant="text"
+          color="white"
+          @click="triggerBadgeSave()"
+        >
+          保存设置
         </v-btn>
       </template>
     </template>

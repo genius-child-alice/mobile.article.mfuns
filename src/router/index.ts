@@ -32,6 +32,12 @@ import MessageLikeView from '../views/message/MessageLikeView.vue'
 import MessageNotifyView from '../views/message/MessageNotifyView.vue'
 import MessageCommentView from '../views/message/MessageCommentView.vue'
 import MessageChatView from '../views/message/MessageChatView.vue'
+import MemberRegisterView from '../views/member/MemberRegisterView.vue'
+import MemberResetPasswordView from '../views/member/MemberResetPasswordView.vue'
+import MemberBadgesView from '../views/member/MemberBadgesView.vue'
+import SearchView from '../views/search/SearchView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
+import TagView from '../views/tag/TagView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -44,6 +50,9 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/timeline': TimelineView,
   '/member': MemberView,
   '/member/login': MemberLoginView,
+  '/member/register': MemberRegisterView,
+  '/member/reset_password': MemberResetPasswordView,
+  '/member/badges': MemberBadgesView,
   '/member/profile': MemberProfileView,
   '/member/history': MemberHistoryView,
   '/member/sign': MemberSignView,
@@ -53,6 +62,8 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/playlist/mylist': PlaylistMyListView,
   '/blackroom': BlackroomView,
   '/leaderboard': LeaderboardView,
+  '/search': SearchView,
+  '/404': NotFoundView,
   '/create': CreateView,
   '/create/article': CreateArticleView,
   '/create/feed': CreateFeedView,
@@ -96,6 +107,7 @@ const shellStretchMainPaths = new Set([
   '/premium',
   '/media',
   '/leaderboard',
+  '/search',
   '/member/login',
   '/member/register',
   '/member/reset_password',
@@ -179,9 +191,7 @@ export const router = createRouter({
             },
             {
               path: 'list',
-              name: pathToRouteName('/message/list'),
-              component: RoutePlaceholder,
-              meta: messageChildMeta('/message/list'),
+              redirect: '/message',
             },
             {
               path: ':uid(\\d+)',
@@ -230,9 +240,19 @@ export const router = createRouter({
           },
         },
         {
+          path: 'tag/:tag',
+          name: 'tag-detail',
+          component: TagView,
+          meta: {
+            title: '标签',
+            showBottomNav: false,
+            shellFullBleed: true,
+          },
+        },
+        {
           path: ':pathMatch(.*)*',
           name: 'catch-all',
-          component: RoutePlaceholder,
+          component: NotFoundView,
           meta: { title: '404', showBottomNav: false },
         },
       ],

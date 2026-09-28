@@ -9,6 +9,7 @@ export type MfunsAppBarTrailing =
   | 'playlist-new'
   | 'history-clear'
   | 'sign-rank'
+  | 'badges-save'
 
 export interface MfunsAppBarConfig {
   visible: boolean
@@ -52,6 +53,17 @@ function backBar(
 
 /** Per-path app bar (from live m.mfuns.net SSR, static routes). */
 export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
+  const tagMatch = path.match(/^\/tag\/(.+)$/)
+  if (tagMatch) {
+    let tag = tagMatch[1]
+    try {
+      tag = decodeURIComponent(tag)
+    } catch {
+      /* keep raw */
+    }
+    return backBar(tag)
+  }
+
   if (
     path === '/premium' ||
     path === '/create/video' ||
@@ -120,7 +132,7 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     '/member/register': backBar('用户注册'),
     '/member/profile': backBar('账号资料'),
     '/member/history': backBar('历史记录', { trailing: 'history-clear' }),
-    '/member/badges': backBar('徽章设置'),
+    '/member/badges': backBar('徽章设置', { trailing: 'badges-save' }),
     '/member/sign': backBar('每日签到', { trailing: 'sign-rank' }),
     '/member/sign_rank': backBar('签到排行榜'),
     '/member/reset_password': backBar('重置密码'),
