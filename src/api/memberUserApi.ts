@@ -5,6 +5,11 @@ export interface MemberFollowStats {
   follow?: number
 }
 
+export interface MemberPremiumInfo {
+  /** Unix 秒；存在且大于当前时间表示会员有效 */
+  expire_time?: number
+}
+
 export interface MemberUserInfo {
   id: number
   name?: string
@@ -23,6 +28,7 @@ export interface MemberUserInfo {
   follow?: MemberFollowStats
   /** Worn badge ids (reference: member_auth.wearBadges). */
   badges?: number[]
+  premium?: MemberPremiumInfo
 }
 
 export interface MemberUserInfoData {

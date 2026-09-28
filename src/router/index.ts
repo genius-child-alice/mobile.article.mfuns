@@ -14,6 +14,7 @@ import TimelineView from '../views/timeline/TimelineView.vue'
 import HomeView from '../views/home/HomeView.vue'
 import FeedDetailView from '../views/feed/FeedDetailView.vue'
 import ArticleDetailView from '../views/article/ArticleDetailView.vue'
+import PremiumView from '../views/premium/PremiumView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -28,6 +29,7 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/member/login': MemberLoginView,
   '/member/profile': MemberProfileView,
   '/member/history': MemberHistoryView,
+  '/premium': PremiumView,
   '/settings': SettingsView,
   '/settings/about': SettingsAboutView,
   '/settings/security': SettingsSecurityView,
@@ -50,6 +52,7 @@ const shellFullBleedPaths = new Set([
 const shellStretchMainPaths = new Set([
   '/home',
   '/timeline',
+  '/premium',
   '/member/login',
   '/member/register',
   '/member/reset_password',

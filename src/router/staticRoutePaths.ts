@@ -72,7 +72,7 @@ export function pathToTitle(path: string): string {
     '/create/success': '发布成功',
     '/playlist/mylist': '我的收藏',
     '/media': '媒体库',
-    '/premium': '会员',
+    '/premium': '开通会员',
     '/message': '消息',
     '/message/comment': '评论消息',
     '/message/like': '点赞消息',
