@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
+import { fetchFollowCount } from '../api/followApi'
 import type { MemberUserInfo } from '../api/memberUserApi'
+import { readMemberAuthState } from '../auth/memberSession'
 import MfunsBadge from './MfunsBadge.vue'
 import { formatRelativeTime } from '../utils/mfunsTime'
 import { mfunsImageUrl } from '../utils/mfunsImageUrl'
@@ -16,6 +18,37 @@ const { smAndUp } = useDisplay()
 
 const bannerSrc = computed(() => mfunsImageUrl(props.user.banner_image, 1000))
 const avatarSrc = computed(() => mfunsImageUrl(props.user.avatar, 300))
+
+const followCount = ref<number | null>(null)
+const fansCount = ref<number | null>(null)
+
+const displayFollowCount = computed(
+  () => followCount.value ?? props.user.follow?.follow ?? 0,
+)
+const displayFansCount = computed(() => fansCount.value ?? props.user.follow?.fans ?? 0)
+
+async function loadFollowStats() {
+  if (!props.user.id) return
+  const { token } = readMemberAuthState()
+  const res = await fetchFollowCount(props.user.id, token)
+  if (res.code === 1 && res.data) {
+    if (typeof res.data.follow === 'number') followCount.value = res.data.follow
+    if (typeof res.data.fans === 'number') fansCount.value = res.data.fans
+  }
+}
+
+onMounted(() => {
+  void loadFollowStats()
+})
+
+watch(
+  () => props.user.id,
+  () => {
+    followCount.value = null
+    fansCount.value = null
+    void loadFollowStats()
+  },
+)
 
 const displayBadgeIds = computed(() => {
   const ids: number[] = []
@@ -62,11 +95,11 @@ function goFollow(type: 'follow' | 'fans') {
         <div class="my-1 text-white member-card__stats">
           <span>UID{{ user.id }}</span>
           <span class="member-card__stat-link ms-3" @click.stop="goFollow('follow')">
-            <span>{{ user.follow?.follow ?? 0 }}</span>
+            <span>{{ displayFollowCount }}</span>
             <span class="member-card__stat-label"> 关注</span>
           </span>
           <span class="member-card__stat-link ms-3" @click.stop="goFollow('fans')">
-            <span>{{ user.follow?.fans ?? 0 }}</span>
+            <span>{{ displayFansCount }}</span>
             <span class="member-card__stat-label"> 粉丝</span>
           </span>
           <span class="ms-3">
@@ -103,10 +136,10 @@ function goFollow(type: 'follow' | 'fans') {
         <div class="text-center text-body-2 mt-2 member-card__stats">
           <span>UID{{ user.id }}</span>
           <span class="member-card__stat-link ms-2" @click.stop="goFollow('follow')">
-            {{ user.follow?.follow ?? 0 }} 关注
+            {{ displayFollowCount }} 关注
           </span>
           <span class="member-card__stat-link ms-2" @click.stop="goFollow('fans')">
-            {{ user.follow?.fans ?? 0 }} 粉丝
+            {{ displayFansCount }} 粉丝
           </span>
         </div>
       </v-container>

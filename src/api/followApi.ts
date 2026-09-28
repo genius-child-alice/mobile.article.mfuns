@@ -20,7 +20,20 @@ export interface FollowListData {
   list?: FollowListItem[]
 }
 
+/** 参考站 follow.count → GET /follow/count */
+export interface FollowCountData {
+  follow?: number
+  fans?: number
+}
+
 /** 参考站 MemberSelect：空搜索时拉关注列表 */
+export function fetchFollowCount(
+  userId: number,
+  token?: string | null,
+): Promise<MfunsApiEnvelope<FollowCountData>> {
+  return mfunsGet<FollowCountData>('/follow/count', { user_id: userId }, token)
+}
+
 export function fetchFollowList(
   userId: number,
   lastId: number,
