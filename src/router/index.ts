@@ -21,6 +21,10 @@ import MemberSignView from '../views/member/MemberSignView.vue'
 import BlackroomView from '../views/blackroom/BlackroomView.vue'
 import MemberSignRankView from '../views/member/MemberSignRankView.vue'
 import PlaylistDetailView from '../views/playlist/PlaylistDetailView.vue'
+import CreateView from '../views/create/CreateView.vue'
+import CreateArticleView from '../views/create/CreateArticleView.vue'
+import CreateFeedView from '../views/create/CreateFeedView.vue'
+import CreateSuccessView from '../views/create/CreateSuccessView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -41,6 +45,10 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/media': MediaView,
   '/playlist/mylist': PlaylistMyListView,
   '/blackroom': BlackroomView,
+  '/create': CreateView,
+  '/create/article': CreateArticleView,
+  '/create/feed': CreateFeedView,
+  '/create/success': CreateSuccessView,
   '/settings': SettingsView,
   '/settings/about': SettingsAboutView,
   '/settings/security': SettingsSecurityView,
@@ -57,6 +65,10 @@ const shellFullBleedPaths = new Set([
   '/blackroom',
   '/playlist/mylist',
   '/media',
+  '/create',
+  '/create/article',
+  '/create/feed',
+  '/create/success',
   '/settings',
   '/settings/about',
   '/settings/security',

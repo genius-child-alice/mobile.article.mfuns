@@ -5,6 +5,7 @@ export type MfunsAppBarTrailing =
   | 'none'
   | 'member-register'
   | 'create-article-actions'
+  | 'create-feed-publish'
   | 'playlist-new'
   | 'history-clear'
   | 'sign-rank'
@@ -121,9 +122,9 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     '/member/reset_password': backBar('重置密码'),
     '/leaderboard': backBar('全站排行', { extensionTabs: ['全站排行'] }),
     '/blackroom': backBar('小黑屋'),
-    '/create': backBar('投稿中心', { extensionTabs: ['视频', '文章'] }),
+    '/create': backBar('投稿中心'),
     '/create/article': backBar('投稿', { trailing: 'create-article-actions' }),
-    '/create/feed': backBar('发布动态'),
+    '/create/feed': backBar('发布动态', { trailing: 'create-feed-publish' }),
     '/create/success': backBar('投稿成功'),
     '/playlist/mylist': backBar('收藏夹列表', { trailing: 'playlist-new' }),
     '/media': backBar('媒体库'),

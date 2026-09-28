@@ -10,6 +10,12 @@ import {
   notifyMemberHistoryCleared,
 } from '../composables/useMemberHistoryClear'
 import { openPlaylistCreateDialog } from '../composables/usePlaylistNew'
+import {
+  triggerCreateArticlePublish,
+  triggerCreateArticleSave,
+  triggerCreateFeedPublish,
+  useCreateArticleTitleOverride,
+} from '../composables/useCreateActions'
 import { clearMemberHistory } from '../api/memberUserApi'
 import { refreshMemberProfile } from '../composables/useMemberProfile'
 import { readMemberAuthState } from '../auth/memberSession'
@@ -41,10 +47,14 @@ const createMenuOpen = ref(false)
 const notifyCount = ref(0)
 const historyClearDialog = useMemberHistoryClearDialog()
 const historyClearLoading = ref(false)
+const createArticleTitleOverride = useCreateArticleTitleOverride()
 
 const pageTitle = computed(() => {
   if (props.config.variant !== 'back') return ''
   if (route.path.startsWith('/message/')) return ''
+  if (route.path === '/create/article' && createArticleTitleOverride.value) {
+    return createArticleTitleOverride.value
+  }
   if (props.config.title) return props.config.title
   return (route.meta.title as string | undefined) ?? ''
 })
@@ -203,13 +213,35 @@ async function confirmClearHistory() {
           用户注册
         </v-btn>
         <template v-else-if="config.trailing === 'create-article-actions'">
-          <v-btn icon variant="text" color="white" aria-label="保存">
+          <v-btn
+            icon
+            variant="text"
+            color="white"
+            aria-label="保存"
+            @click="triggerCreateArticleSave()"
+          >
             <v-icon icon="mdi-content-save" />
           </v-btn>
-          <v-btn icon variant="text" color="white" aria-label="发布">
+          <v-btn
+            icon
+            variant="text"
+            color="white"
+            aria-label="发布"
+            @click="triggerCreateArticlePublish()"
+          >
             <v-icon icon="mdi-send" />
           </v-btn>
         </template>
+        <v-btn
+          v-else-if="config.trailing === 'create-feed-publish'"
+          icon
+          variant="text"
+          color="white"
+          aria-label="发布"
+          @click="triggerCreateFeedPublish()"
+        >
+          <v-icon icon="mdi-send" />
+        </v-btn>
         <v-btn
           v-else-if="config.trailing === 'playlist-new'"
           icon

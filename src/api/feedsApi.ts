@@ -144,3 +144,20 @@ export function deleteFeed(
 ): Promise<MfunsApiEnvelope<unknown>> {
   return mfunsPost('/feeds/delete', { id }, token)
 }
+
+export function createFeed(
+  content: string,
+  images: string[],
+  tags: string[],
+  token: string,
+): Promise<MfunsApiEnvelope<{ resource_id?: number }>> {
+  return mfunsPost(
+    '/feeds/create',
+    {
+      content,
+      images: JSON.stringify(images),
+      tags: tags.join(','),
+    },
+    token,
+  )
+}
