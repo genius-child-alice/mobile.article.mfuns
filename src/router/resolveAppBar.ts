@@ -62,7 +62,7 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     return NO_BAR
   }
 
-  if (path.startsWith('/message/chat/')) {
+  if (/^\/message\/\d+/.test(path) || path.startsWith('/message/chat/')) {
     return backBar('私信')
   }
 

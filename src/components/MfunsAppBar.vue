@@ -24,6 +24,7 @@ import { useTimelineTabs } from '../composables/useTimelineTabs'
 import { useHomeTabs } from '../composables/useHomeTabs'
 import { useLeaderboardTabs } from '../composables/useLeaderboardTabs'
 import { useNotifyCount } from '../composables/useNotifyCount'
+import { useMessageChatTitle } from '../composables/useMessageChatTitle'
 
 const props = defineProps<{
   config: MfunsAppBarConfig
@@ -54,10 +55,13 @@ const { badgeTotal: notifyCount } = useNotifyCount()
 const historyClearDialog = useMemberHistoryClearDialog()
 const historyClearLoading = ref(false)
 const createArticleTitleOverride = useCreateArticleTitleOverride()
+const messageChatTitle = useMessageChatTitle()
 
 const pageTitle = computed(() => {
   if (props.config.variant !== 'back') return ''
-  if (route.path.startsWith('/message/')) return ''
+  if (/^\/message\/\d+/.test(route.path) || route.path.startsWith('/message/chat/')) {
+    return messageChatTitle.value || props.config.title || '私信'
+  }
   if (route.path === '/create/article' && createArticleTitleOverride.value) {
     return createArticleTitleOverride.value
   }

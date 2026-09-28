@@ -67,6 +67,14 @@ export function fetchMemberUserInfo(
   return mfunsGet<MemberUserInfoData>('/user/info', undefined, token)
 }
 
+/** 参考站 getMemberByUid → GET /user/get_user */
+export function fetchUserById(
+  id: number,
+  token?: string | null,
+): Promise<MfunsApiEnvelope<MemberUserInfo>> {
+  return mfunsGet<MemberUserInfo>('/user/get_user', { id }, token)
+}
+
 export const MFUNS_ARTICLE_RESOURCE_TYPE = 0
 
 export function fetchMemberHistory(

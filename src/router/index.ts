@@ -27,6 +27,10 @@ import CreateFeedView from '../views/create/CreateFeedView.vue'
 import CreateSuccessView from '../views/create/CreateSuccessView.vue'
 import LeaderboardView from '../views/leaderboard/LeaderboardView.vue'
 import MessageView from '../views/message/MessageView.vue'
+import MessageMentionView from '../views/message/MessageMentionView.vue'
+import MessageLikeView from '../views/message/MessageLikeView.vue'
+import MessageNotifyView from '../views/message/MessageNotifyView.vue'
+import MessageChatView from '../views/message/MessageChatView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -49,6 +53,9 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/blackroom': BlackroomView,
   '/leaderboard': LeaderboardView,
   '/message': MessageView,
+  '/message/mention': MessageMentionView,
+  '/message/like': MessageLikeView,
+  '/message/notify': MessageNotifyView,
   '/create': CreateView,
   '/create/article': CreateArticleView,
   '/create/feed': CreateFeedView,
@@ -152,14 +159,18 @@ export const router = createRouter({
           },
         },
         {
-          path: 'message/chat/:uid',
+          path: 'message/:uid(\\d+)',
           name: 'message-chat',
-          component: RoutePlaceholder,
+          component: MessageChatView,
           meta: {
             title: '私信',
             showBottomNav: false,
             shellFullBleed: true,
           },
+        },
+        {
+          path: 'message/chat/:uid',
+          redirect: (to) => `/message/${to.params.uid}`,
         },
         {
           path: ':pathMatch(.*)*',

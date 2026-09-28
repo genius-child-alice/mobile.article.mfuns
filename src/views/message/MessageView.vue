@@ -85,7 +85,7 @@ async function refreshAll() {
 function openThread(item: MessageThreadItem) {
   const uid = item.user?.id
   if (!uid) return
-  router.push(`/message/chat/${uid}`)
+  router.push(`/message/${uid}`)
 }
 
 function go(path: string) {

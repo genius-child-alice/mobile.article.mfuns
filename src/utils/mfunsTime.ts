@@ -13,6 +13,22 @@ export function formatRelativeUnixTime(unixSeconds: number | undefined): string 
   return `${y}-${m}-${day}`
 }
 
+/** 接受 unix 秒 / 毫秒时间戳 / ISO 日期字符串 */
+export function formatRelativeTime(raw: number | string | undefined): string {
+  if (raw == null || raw === '') return ''
+  if (typeof raw === 'number') {
+    if (!Number.isFinite(raw)) return ''
+    return formatRelativeUnixTime(raw > 1e12 ? Math.floor(raw / 1000) : raw)
+  }
+  const n = Number(raw)
+  if (Number.isFinite(n) && String(raw).trim() !== '') {
+    return formatRelativeUnixTime(n > 1e12 ? Math.floor(n / 1000) : n)
+  }
+  const ms = Date.parse(raw)
+  if (Number.isNaN(ms)) return ''
+  return formatRelativeUnixTime(Math.floor(ms / 1000))
+}
+
 /** Absolute datetime for profile created_at (aligned with m.mfuns datetimeFormat). */
 export function formatUnixDatetime(unixSeconds: number | undefined): string {
   if (unixSeconds == null || !Number.isFinite(unixSeconds)) return '—'
