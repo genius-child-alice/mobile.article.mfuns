@@ -88,7 +88,7 @@ export function fetchUserArticleList(
     '/article/user_list',
     {
       user_id: userId,
-      aid: lastAid > 0 ? lastAid : undefined,
+      aid: lastAid,
       type: 'pass',
     },
     token,

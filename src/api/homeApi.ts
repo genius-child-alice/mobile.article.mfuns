@@ -32,6 +32,25 @@ export function filterHomeArticleItems(items: HomeContentItem[]): HomeContentIte
   return items.filter((item) => item.type !== HOME_CONTENT_TYPE_VIDEO)
 }
 
+/** 部分列表接口 data 为数组，部分为 { list } */
+export function normalizeHomeContentList(
+  data: { list?: HomeContentItem[]; last_id?: number } | HomeContentItem[] | undefined,
+): HomeContentItem[] {
+  if (!data) return []
+  if (Array.isArray(data)) return data
+  return Array.isArray(data.list) ? data.list : []
+}
+
+export function normalizeHomeContentLastId(
+  data: { list?: HomeContentItem[]; last_id?: number } | HomeContentItem[] | undefined,
+  fallback: number,
+): number {
+  if (data && typeof data === 'object' && !Array.isArray(data) && typeof data.last_id === 'number') {
+    return data.last_id > 0 ? data.last_id : fallback
+  }
+  return fallback
+}
+
 export interface HomeRecommendData {
   list?: HomeContentItem[]
 }
