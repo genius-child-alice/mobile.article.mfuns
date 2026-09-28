@@ -6,6 +6,7 @@ import { MEMBER_SERVICE_ITEMS } from '../../constants/memberServices'
 import { useMemberAuth } from '../../composables/useMemberAuth'
 import { useMemberProfile } from '../../composables/useMemberProfile'
 import { mfunsImageUrl } from '../../utils/mfunsImageUrl'
+import AuthRouter from '../../components/AuthRouter.vue'
 import MfunsBadge from '../../components/MfunsBadge.vue'
 
 const router = useRouter()
@@ -91,38 +92,38 @@ function openHistoryItem(item: (typeof history.value)[number]) {
 
       <!-- 已登录 -->
       <div v-else class="member-panel">
-        <div
-          class="member-profile-entry d-flex align-center px-4 py-4"
-        role="button"
-        tabindex="0"
-        @click="go('/member/profile')"
-        @keydown.enter="go('/member/profile')"
-      >
-        <v-avatar size="48" color="grey-lighten-2" class="me-3">
-          <v-img v-if="avatarSrc" :src="avatarSrc" cover />
-          <v-icon v-else icon="mdi-account" size="32" />
-        </v-avatar>
-        <div class="flex-grow-1 min-width-0">
-          <div class="member-profile-entry__title d-flex align-center flex-wrap">
-            <span
-              class="text-subtitle-1 font-weight-medium text-truncate"
-              :class="memberNameColorClass"
-            >
-              {{ memberInfo?.name || '个人资料' }}
-            </span>
-            <span
-              v-if="displayBadgeIds.length"
-              class="member-profile-entry__badges d-inline-flex align-center"
-            >
-              <MfunsBadge v-for="badgeId in displayBadgeIds" :key="badgeId" :id="badgeId" />
-            </span>
+        <AuthRouter class="auth-router" :to="memberId ? `/member/${memberId}` : ''">
+          <div
+            class="member-current d-flex align-center px-4 py-2"
+            role="button"
+            tabindex="0"
+          >
+            <v-avatar size="48" color="grey-lighten-2" class="me-3">
+              <v-img v-if="avatarSrc" :src="avatarSrc" cover />
+              <v-icon v-else icon="mdi-account" size="32" />
+            </v-avatar>
+            <div class="flex-grow-1 min-width-0">
+              <div class="member-current__title d-flex align-center flex-wrap">
+                <span
+                  class="text-subtitle-1 font-weight-medium text-truncate"
+                  :class="memberNameColorClass"
+                >
+                  {{ memberInfo?.name || '个人资料' }}
+                </span>
+                <span
+                  v-if="displayBadgeIds.length"
+                  class="member-current__badges d-inline-flex align-center"
+                >
+                  <MfunsBadge v-for="badgeId in displayBadgeIds" :key="badgeId" :id="badgeId" />
+                </span>
+              </div>
+              <div class="text-caption text-medium-emphasis text-truncate">
+                {{ profileSubtitle }}
+              </div>
+            </div>
+            <v-icon icon="mdi-arrow-right" color="medium-emphasis" />
           </div>
-          <div class="text-caption text-medium-emphasis text-truncate">
-            {{ profileSubtitle }}
-          </div>
-        </div>
-        <v-icon icon="mdi-arrow-right" color="medium-emphasis" />
-      </div>
+        </AuthRouter>
 
       <v-divider />
 
@@ -285,25 +286,25 @@ function openHistoryItem(item: (typeof history.value)[number]) {
   width: 100%;
 }
 
-.member-profile-entry {
+.member-current {
   cursor: pointer;
 }
 
-.member-profile-entry__title {
+.member-current__title {
   row-gap: 2px;
 }
 
-.member-profile-entry__badges {
+.member-current__badges {
   margin-inline-start: 8px;
   column-gap: 2px;
 }
 
-.member-profile-entry__title .text-truncate {
+.member-current__title .text-truncate {
   max-width: 100%;
   flex: 0 1 auto;
 }
 
-.member-profile-entry:focus-visible {
+.member-current:focus-visible {
   outline: 2px solid rgb(var(--v-theme-primary));
   outline-offset: -2px;
 }

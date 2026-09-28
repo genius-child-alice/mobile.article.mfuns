@@ -29,6 +29,8 @@ export interface MemberUserInfo {
   /** Worn badge ids (reference: member_auth.wearBadges). */
   badges?: number[]
   premium?: MemberPremiumInfo
+  banner_image?: string
+  info?: string
 }
 
 export interface MemberUserInfoData {

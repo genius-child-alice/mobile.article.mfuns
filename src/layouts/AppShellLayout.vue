@@ -18,6 +18,7 @@ const {
   showHomeExtensionTabs,
   showHomeInlineTabs,
   showBackExtensionTabs,
+  showMemberPageInlineTabs,
   appBarExtended,
   shellStyle,
   mdAndUp,
@@ -41,6 +42,7 @@ const {
       :show-home-extension-tabs="showHomeExtensionTabs"
       :show-home-inline-tabs="showHomeInlineTabs"
       :show-back-extension-tabs="showBackExtensionTabs"
+      :show-member-page-inline-tabs="showMemberPageInlineTabs"
     />
 
     <v-main

@@ -1,4 +1,5 @@
 import { mfunsGet, type MfunsApiEnvelope } from './mfunsApi'
+import type { HomeContentItem } from './homeApi'
 import type { FeedLikeStatus, FeedUser } from './feedsApi'
 
 export interface ArticleCategory {
@@ -73,6 +74,23 @@ export function fetchSeriesItems(
   return mfunsGet<{ list?: ArticleSeriesItem[] }>(
     '/series/items',
     { series_id: seriesId },
+    token,
+  )
+}
+
+/** 参考站 article.listUser → GET /article/user_list */
+export function fetchUserArticleList(
+  userId: number,
+  lastAid = 0,
+  token?: string | null,
+): Promise<MfunsApiEnvelope<{ list?: HomeContentItem[]; last_id?: number }>> {
+  return mfunsGet(
+    '/article/user_list',
+    {
+      user_id: userId,
+      aid: lastAid > 0 ? lastAid : undefined,
+      type: 'pass',
+    },
     token,
   )
 }

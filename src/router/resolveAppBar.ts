@@ -10,6 +10,7 @@ export type MfunsAppBarTrailing =
   | 'history-clear'
   | 'sign-rank'
   | 'badges-save'
+  | 'member-page-actions'
 
 export interface MfunsAppBarConfig {
   visible: boolean
@@ -62,6 +63,14 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
       /* keep raw */
     }
     return backBar(tag)
+  }
+
+  if (/^\/member\/(\d+)$/.test(path)) {
+    return backBar('', {
+      extensionTabs: ['首页', '文章', '收藏'],
+      extensionTabsXsOnly: true,
+      trailing: 'member-page-actions',
+    })
   }
 
   if (

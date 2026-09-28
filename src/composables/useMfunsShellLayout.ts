@@ -38,10 +38,19 @@ export function useMfunsShellLayout(options: {
     () => options.appBar.value.variant === 'timeline',
   )
 
+  const showMemberPageInlineTabs = computed(() => {
+    const bar = options.appBar.value
+    if (bar.variant !== 'back' || bar.trailing !== 'member-page-actions') return false
+    if (!bar.extensionTabs.length) return false
+    return !xs.value
+  })
+
   const showBackExtensionTabs = computed(() => {
     const bar = options.appBar.value
     if (bar.variant !== 'back') return false
-    return bar.extensionTabs.length > 0
+    if (!bar.extensionTabs.length) return false
+    if (bar.extensionTabsXsOnly) return xs.value
+    return true
   })
 
   const appBarExtended = computed(
@@ -75,6 +84,7 @@ export function useMfunsShellLayout(options: {
     showHomeInlineTabs,
     showTimelineTabs,
     showBackExtensionTabs,
+    showMemberPageInlineTabs,
     appBarExtended,
     appBarHeight,
     shellStyle,

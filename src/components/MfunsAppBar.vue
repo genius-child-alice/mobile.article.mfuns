@@ -17,7 +17,8 @@ import {
   useCreateArticleTitleOverride,
 } from '../composables/useCreateActions'
 import { clearMemberHistory } from '../api/memberUserApi'
-import { refreshMemberProfile } from '../composables/useMemberProfile'
+import { refreshMemberProfile, useMemberProfile } from '../composables/useMemberProfile'
+import FollowBtn from './FollowBtn.vue'
 import { readMemberAuthState } from '../auth/memberSession'
 import type { MfunsAppBarConfig } from '../router/resolveAppBar'
 import { useTimelineTabs } from '../composables/useTimelineTabs'
@@ -31,6 +32,7 @@ import {
   submitSearchInput,
   useSearchBar,
 } from '../composables/useSearchBar'
+import { useMemberPageTabs } from '../composables/useMemberPageTabs'
 
 const props = defineProps<{
   config: MfunsAppBarConfig
@@ -38,12 +40,14 @@ const props = defineProps<{
   showHomeExtensionTabs: boolean
   showHomeInlineTabs: boolean
   showBackExtensionTabs: boolean
+  showMemberPageInlineTabs: boolean
 }>()
 
 const route = useRoute()
 const router = useRouter()
 const { mobile } = useDisplay()
 const { isLoggedIn } = useMemberAuth()
+const { memberId: currentMemberId } = useMemberProfile()
 
 const { tabIndex: homeTabIndex } = useHomeTabs()
 const { tabIndex: timelineTabIndex, tabLabels: timelineTabLabels } = useTimelineTabs()
@@ -53,7 +57,10 @@ const {
 } = useLeaderboardTabs()
 const backExtensionTabIndex = ref(0)
 const isLeaderboard = computed(() => route.path === '/leaderboard')
+const isMemberPage = computed(() => /^\/member\/\d+/.test(route.path))
 const { query: searchQuery } = useSearchBar()
+const { tabIndex: memberPageTabIndex, tabLabels: memberPageTabLabels, pageTitle: memberPageTitle, pageUserId: memberPageUserId } =
+  useMemberPageTabs()
 const createDialogOpen = ref(false)
 const createMenuOpen = ref(false)
 
@@ -70,6 +77,9 @@ const pageTitle = computed(() => {
   }
   if (route.path === '/create/article' && createArticleTitleOverride.value) {
     return createArticleTitleOverride.value
+  }
+  if (isMemberPage.value && memberPageTitle.value) {
+    return memberPageTitle.value
   }
   if (props.config.title) return props.config.title
   return (route.meta.title as string | undefined) ?? ''
@@ -232,7 +242,27 @@ async function confirmClearHistory() {
         <v-btn icon variant="text" color="white" aria-label="返回" @click="goBack">
           <v-icon icon="mdi-arrow-left" />
         </v-btn>
-        <v-toolbar-title class="mfuns-app-bar__title">{{ pageTitle }}</v-toolbar-title>
+        <v-toolbar-title
+          class="mfuns-app-bar__title"
+          :class="{
+            'mfuns-app-bar__title--member-inline':
+              config.trailing === 'member-page-actions' && showMemberPageInlineTabs,
+          }"
+        >
+          {{ pageTitle }}
+        </v-toolbar-title>
+        <v-tabs
+          v-if="config.trailing === 'member-page-actions' && showMemberPageInlineTabs"
+          v-model="memberPageTabIndex"
+          align-tabs="center"
+          grow
+          class="mfuns-home-tabs mfuns-home-tabs--member-inline"
+          color="white"
+        >
+          <v-tab v-for="(label, i) in memberPageTabLabels" :key="`mp-inline-${label}`" :value="i">
+            {{ label }}
+          </v-tab>
+        </v-tabs>
         <v-spacer />
         <v-btn
           v-if="config.trailing === 'member-register'"
@@ -308,6 +338,23 @@ async function confirmClearHistory() {
         >
           保存设置
         </v-btn>
+        <template v-else-if="config.trailing === 'member-page-actions' && memberPageUserId">
+          <FollowBtn
+            v-if="memberPageUserId !== currentMemberId"
+            :user-id="memberPageUserId"
+            color="white"
+          />
+          <v-btn
+            v-if="isLoggedIn && memberPageUserId !== currentMemberId"
+            icon
+            variant="text"
+            color="white"
+            aria-label="私信"
+            :to="{ path: `/message/${memberPageUserId}` }"
+          >
+            <v-icon icon="mdi-email-outline" />
+          </v-btn>
+        </template>
       </template>
     </template>
 
@@ -336,6 +383,17 @@ async function confirmClearHistory() {
           :key="`lb-${i}-${label}`"
           :value="i"
         >
+          {{ label }}
+        </v-tab>
+      </v-tabs>
+      <v-tabs
+        v-else-if="isMemberPage && showBackExtensionTabs"
+        v-model="memberPageTabIndex"
+        grow
+        class="mfuns-home-tabs mfuns-home-tabs--extension"
+        color="white"
+      >
+        <v-tab v-for="(label, i) in memberPageTabLabels" :key="`mp-${label}`" :value="i">
           {{ label }}
         </v-tab>
       </v-tabs>
@@ -417,6 +475,21 @@ async function confirmClearHistory() {
   padding-inline-start: 8px;
 }
 
+.mfuns-app-bar__title--member-inline {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: max(4rem, calc(50% - 190px));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mfuns-app-bar__title--member-inline :deep(.v-toolbar-title__placeholder) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .mfuns-logo {
   display: block;
   flex-shrink: 0;
@@ -426,6 +499,21 @@ async function confirmClearHistory() {
 .mfuns-home-tabs--inline {
   width: 280px;
   max-width: min(280px, 42vw);
+}
+
+.mfuns-app-bar:has(.mfuns-home-tabs--member-inline) :deep(.v-toolbar__content) {
+  position: relative;
+}
+
+.mfuns-home-tabs--member-inline {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100% - 140px));
+  max-width: 360px;
+  z-index: 1;
+  pointer-events: auto;
 }
 
 .mfuns-home-tabs--timeline {

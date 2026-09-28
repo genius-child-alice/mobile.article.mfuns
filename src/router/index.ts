@@ -35,6 +35,7 @@ import MessageChatView from '../views/message/MessageChatView.vue'
 import MemberRegisterView from '../views/member/MemberRegisterView.vue'
 import MemberResetPasswordView from '../views/member/MemberResetPasswordView.vue'
 import MemberBadgesView from '../views/member/MemberBadgesView.vue'
+import MemberDetailView from '../views/member/MemberDetailView.vue'
 import SearchView from '../views/search/SearchView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import TagView from '../views/tag/TagView.vue'
@@ -237,6 +238,16 @@ export const router = createRouter({
             title: '收藏夹',
             showBottomNav: false,
             shellStretchMain: true,
+          },
+        },
+        {
+          path: 'member/:id(\\d+)',
+          name: 'member-detail',
+          component: MemberDetailView,
+          meta: {
+            title: '用户',
+            showBottomNav: false,
+            shellFullBleed: true,
           },
         },
         {
