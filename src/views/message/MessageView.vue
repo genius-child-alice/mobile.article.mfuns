@@ -102,10 +102,6 @@ function go(path: string) {
   router.push(path)
 }
 
-function isShortcutActive(to: string) {
-  return route.path === to
-}
-
 function isThreadActive(uid: number | undefined) {
   if (!uid) return false
   return route.path === `/message/${uid}`
@@ -141,7 +137,6 @@ onUnmounted(() => {
                 cols="3"
                 v-ripple
                 class="message-page__shortcut"
-                :class="{ 'message-page__shortcut--active': isShortcutActive(item.to) }"
                 @click="go(item.to)"
               >
                 <v-badge
@@ -302,10 +297,6 @@ onUnmounted(() => {
 .message-page__shortcut {
   cursor: pointer;
   border-radius: 8px;
-}
-
-.message-page__shortcut--active {
-  background: rgba(var(--v-theme-primary), 0.08);
 }
 
 .message-page__thread {
