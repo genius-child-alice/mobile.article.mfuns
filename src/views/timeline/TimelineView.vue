@@ -86,41 +86,40 @@ onMounted(() => {
     <v-container fluid class="timeline-page__container py-2">
       <v-row dense class="timeline-page__row">
         <v-col cols="12" md="8" lg="8">
-          <v-window v-model="tabIndex" class="timeline-page__window">
-            <v-window-item :value="0">
-              <FeedTimelineList new-reply />
-              <v-btn
-                class="timeline-page__fab"
-                color="pink"
-                size="large"
-                elevation="4"
-                :to="{ path: isLoggedIn ? '/create/feed' : '/member/login' }"
-                aria-label="发布动态"
-                icon
-              >
-                <v-icon icon="mdi-circle-edit-outline" />
-              </v-btn>
-            </v-window-item>
+          <!-- 不用 v-window：其 overflow:hidden 会干扰触底加载；v-if 保证只有当前 tab 挂载监听 -->
+          <div v-if="tabIndex === 0" class="timeline-page__pane">
+            <FeedTimelineList new-reply />
+            <v-btn
+              class="timeline-page__fab"
+              color="pink"
+              size="large"
+              elevation="4"
+              :to="{ path: isLoggedIn ? '/create/feed' : '/member/login' }"
+              aria-label="发布动态"
+              icon
+            >
+              <v-icon icon="mdi-circle-edit-outline" />
+            </v-btn>
+          </div>
 
-            <v-window-item v-if="isLoggedIn" :value="1">
-              <FeedTimelineList
-                v-if="followFeedUserId > 0"
-                :key="`${followFeedUserId}-${followFeedFollow}`"
-                :user-id="followFeedUserId"
-                :follow="followFeedFollow"
-              >
-                <FeedUserListPanel
-                  v-if="smAndDown"
-                  v-model="selectUserId"
-                  layout="horizontal"
-                  :show-active-state="tabIndex === 1"
-                  class="mb-2"
-                  :users="followUsers"
-                  @select="syncFollowFeedParams"
-                />
-              </FeedTimelineList>
-            </v-window-item>
-          </v-window>
+          <div v-else-if="isLoggedIn && tabIndex === 1" class="timeline-page__pane">
+            <FeedTimelineList
+              v-if="followFeedUserId > 0"
+              :key="`${followFeedUserId}-${followFeedFollow}`"
+              :user-id="followFeedUserId"
+              :follow="followFeedFollow"
+            >
+              <FeedUserListPanel
+                v-if="smAndDown"
+                v-model="selectUserId"
+                layout="horizontal"
+                :show-active-state="tabIndex === 1"
+                class="mb-2"
+                :users="followUsers"
+                @select="syncFollowFeedParams"
+              />
+            </FeedTimelineList>
+          </div>
         </v-col>
 
         <v-col v-if="mdAndUp" cols="12" md="4" lg="4">
@@ -206,8 +205,9 @@ onMounted(() => {
   padding-inline: 0;
 }
 
-.timeline-page__window {
+.timeline-page__pane {
   background: transparent;
+  min-width: 0;
 }
 
 .timeline-page__guest {

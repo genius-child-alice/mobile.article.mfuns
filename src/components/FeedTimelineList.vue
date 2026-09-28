@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import FeedDynamicCard from './FeedDynamicCard.vue'
 import {
   fetchFeedList,
@@ -9,6 +9,8 @@ import {
 } from '../api/feedsApi'
 import { readMemberAuthState } from '../auth/memberSession'
 import { filterTimelineFeeds } from '../utils/feedTimelineFilter'
+
+const SCROLL_THRESHOLD_PX = 240
 
 const props = defineProps<{
   newReply?: boolean
@@ -22,9 +24,172 @@ const loadingMore = ref(false)
 const notMore = ref(false)
 const lastId = ref(-1)
 const page = ref(1)
+const listRootRef = ref<HTMLElement | null>(null)
+const loadMoreSentinel = ref<HTMLElement | null>(null)
+
+const scrollTargets = new Set<HTMLElement | Window>()
+let loadMoreObserver: IntersectionObserver | null = null
+let loadSeq = 0
 
 function authToken(): string | null {
   return readMemberAuthState().token
+}
+
+function isListVisible(): boolean {
+  const el = listRootRef.value
+  if (!el) return false
+  return el.getClientRects().length > 0
+}
+
+function canLoadMore(): boolean {
+  return (
+    isListVisible() &&
+    !loading.value &&
+    !loadingMore.value &&
+    !notMore.value &&
+    list.value.length > 0
+  )
+}
+
+function collectScrollTargets(start: HTMLElement | null): Array<HTMLElement | Window> {
+  const targets: Array<HTMLElement | Window> = []
+  const seen = new Set<HTMLElement | Window>()
+
+  const add = (t: HTMLElement | Window | null | undefined) => {
+    if (!t || seen.has(t)) return
+    seen.add(t)
+    targets.push(t)
+  }
+
+  let el: HTMLElement | null = start
+  while (el) {
+    const { overflowY } = getComputedStyle(el)
+    if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') {
+      add(el)
+    }
+    el = el.parentElement
+  }
+
+  const mainScroller = document.querySelector('.v-main__scroller')
+  if (mainScroller instanceof HTMLElement) add(mainScroller)
+
+  add(window)
+  return targets
+}
+
+function isNearBottom(target: HTMLElement | Window): boolean {
+  if (target === window) {
+    const doc = document.documentElement
+    const top = window.scrollY || doc.scrollTop || 0
+    return doc.scrollHeight - top - window.innerHeight < SCROLL_THRESHOLD_PX
+  }
+  const el = target as HTMLElement
+  return el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_THRESHOLD_PX
+}
+
+function anyTargetNearBottom(): boolean {
+  for (const t of scrollTargets) {
+    if (isNearBottom(t)) return true
+  }
+  if (scrollTargets.size === 0) {
+    const doc = document.documentElement
+    const top = window.scrollY || doc.scrollTop || 0
+    return doc.scrollHeight - top - window.innerHeight < SCROLL_THRESHOLD_PX
+  }
+  return false
+}
+
+function tryLoadMoreFromScroll() {
+  if (!canLoadMore()) return
+  if (!anyTargetNearBottom()) return
+  void load(false)
+}
+
+function onScroll(ev?: Event) {
+  if (!canLoadMore()) return
+  const t = ev?.target
+  if (t instanceof HTMLElement && isNearBottom(t)) {
+    void load(false)
+    return
+  }
+  if (isNearBottom(window) || anyTargetNearBottom()) {
+    void load(false)
+  }
+}
+
+function unbindScrollListeners() {
+  document.removeEventListener('scroll', onScroll, true)
+  for (const t of scrollTargets) {
+    if (t === window) {
+      window.removeEventListener('scroll', onScroll)
+    } else {
+      t.removeEventListener('scroll', onScroll)
+    }
+  }
+  scrollTargets.clear()
+}
+
+function bindScrollListeners() {
+  unbindScrollListeners()
+  // 捕获阶段可收到任意滚动容器的 scroll（含 .v-main__scroller）
+  document.addEventListener('scroll', onScroll, { passive: true, capture: true })
+  scrollTargets.add(window)
+  for (const t of collectScrollTargets(listRootRef.value)) {
+    if (t === window) continue
+    scrollTargets.add(t)
+    t.addEventListener('scroll', onScroll, { passive: true })
+  }
+  window.addEventListener('scroll', onScroll, { passive: true })
+}
+
+function resolveObserverRoot(): Element | null {
+  let el = loadMoreSentinel.value?.parentElement ?? listRootRef.value
+  while (el) {
+    const { overflowY } = getComputedStyle(el)
+    if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') {
+      if (el.scrollHeight > el.clientHeight + 2) return el
+    }
+    el = el.parentElement
+  }
+  const mainScroller = document.querySelector('.v-main__scroller')
+  if (
+    mainScroller instanceof HTMLElement &&
+    mainScroller.scrollHeight > mainScroller.clientHeight + 2
+  ) {
+    return mainScroller
+  }
+  return null
+}
+
+function onLoadMoreIntersect(entries: IntersectionObserverEntry[]) {
+  if (!entries.some((e) => e.isIntersecting)) return
+  if (!canLoadMore()) return
+  void load(false)
+}
+
+function unbindLoadMoreObserver() {
+  loadMoreObserver?.disconnect()
+  loadMoreObserver = null
+}
+
+function bindLoadMoreObserver() {
+  unbindLoadMoreObserver()
+  const sentinel = loadMoreSentinel.value
+  if (!sentinel || notMore.value || list.value.length === 0) return
+
+  loadMoreObserver = new IntersectionObserver(onLoadMoreIntersect, {
+    root: resolveObserverRoot(),
+    threshold: 0,
+    rootMargin: '0px 0px 240px 0px',
+  })
+  loadMoreObserver.observe(sentinel)
+}
+
+async function rebindInfiniteLoad() {
+  await nextTick()
+  bindScrollListeners()
+  bindLoadMoreObserver()
+  tryLoadMoreFromScroll()
 }
 
 async function load(reset = false) {
@@ -36,7 +201,9 @@ async function load(reset = false) {
   }
 
   if (notMore.value) return false
+  if (!reset && (loading.value || loadingMore.value)) return false
 
+  const seq = ++loadSeq
   const isFirst = list.value.length === 0 || reset
   if (isFirst) loading.value = true
   else loadingMore.value = true
@@ -61,6 +228,8 @@ async function load(reset = false) {
       return false
     }
 
+    if (seq !== loadSeq) return false
+
     if (res.code !== 1 || !Array.isArray(res.data)) {
       notMore.value = true
       return false
@@ -80,13 +249,19 @@ async function load(reset = false) {
     if (props.newReply) page.value += 1
 
     if (incoming.length === 0) {
+      // 本页全被过滤：继续拉下一页，避免卡在空结果
+      loading.value = false
+      loadingMore.value = false
       return load(false)
     }
 
     return true
   } finally {
-    loading.value = false
-    loadingMore.value = false
+    if (seq === loadSeq) {
+      loading.value = false
+      loadingMore.value = false
+      await rebindInfiniteLoad()
+    }
   }
 }
 
@@ -101,11 +276,17 @@ onMounted(() => {
   void load(true)
 })
 
+onUnmounted(() => {
+  loadSeq += 1
+  unbindScrollListeners()
+  unbindLoadMoreObserver()
+})
+
 defineExpose({ reload: () => load(true) })
 </script>
 
 <template>
-  <div class="feed-timeline-list">
+  <div ref="listRootRef" class="feed-timeline-list">
     <slot />
 
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-2" />
@@ -122,10 +303,33 @@ defineExpose({ reload: () => load(true) })
       <v-divider v-if="index < list.length - 1" class="my-0" />
     </template>
 
-    <div v-if="!loading && list.length > 0 && !notMore" class="py-3 text-center">
-      <v-btn variant="text" color="link" :loading="loadingMore" @click="load()">
+    <div
+      v-if="list.length > 0 && !notMore"
+      ref="loadMoreSentinel"
+      class="feed-timeline-list__more py-3 text-center"
+    >
+      <v-progress-circular
+        v-if="loadingMore"
+        indeterminate
+        color="link"
+        size="24"
+        width="2"
+      />
+      <v-btn
+        v-else
+        variant="text"
+        color="link"
+        :disabled="loading"
+        @click="load(false)"
+      >
         加载更多
       </v-btn>
+    </div>
+    <div
+      v-else-if="list.length > 0 && notMore"
+      class="text-body-2 text-medium-emphasis text-center py-3"
+    >
+      没有更多了
     </div>
   </div>
 </template>
@@ -133,5 +337,9 @@ defineExpose({ reload: () => load(true) })
 <style scoped>
 .feed-timeline-list {
   min-width: 0;
+}
+
+.feed-timeline-list__more {
+  min-height: 48px;
 }
 </style>
