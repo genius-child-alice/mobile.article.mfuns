@@ -59,14 +59,6 @@ const displayBadgeIds = computed(() => {
   return ids
 })
 
-const mobileWornBadgeIds = computed(() => {
-  const ids: number[] = []
-  for (const id of props.user.badges ?? []) {
-    if (id !== props.user.level_id && !ids.includes(id)) ids.push(id)
-  }
-  return ids
-})
-
 function nameColorClass(raw: string | undefined): string | undefined {
   const color = raw?.trim()
   if (!color) return undefined
@@ -137,10 +129,7 @@ function goFollow(type: 'follow' | 'fans') {
           <span :class="nameColorClass(user.name_color)">{{ user.name }}</span>
           <v-icon v-if="user.gender === 1" icon="mdi-gender-male" color="#00b9ff" size="18" />
           <v-icon v-if="user.gender === 2" icon="mdi-gender-female" color="#ea7c8d" size="18" />
-          <MfunsBadge v-if="user.level_id" :id="user.level_id" />
-        </div>
-        <div v-if="mobileWornBadgeIds.length" class="member-card__mobile-badges">
-          <MfunsBadge v-for="badgeId in mobileWornBadgeIds" :key="`m-${badgeId}`" :id="badgeId" />
+          <MfunsBadge v-for="badgeId in displayBadgeIds" :key="`m-${badgeId}`" :id="badgeId" />
         </div>
         <div class="text-center text-body-2 member-card__stats member-card__stats--mobile">
           <span>UID{{ user.id }}</span>
@@ -246,23 +235,25 @@ function goFollow(type: 'follow' | 'fans') {
   gap: 4px;
 }
 
-.member-card__mobile-badges {
+.member-card__name-row--mobile {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   justify-content: center;
+  gap: 4px;
+  line-height: 1.25;
+  max-width: 100%;
+}
+
+.member-card__name-row--mobile > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .member-card__stats--mobile {
   margin: 0;
-  line-height: 1.25;
-}
-
-.member-card__name-row--mobile {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
   line-height: 1.25;
 }
 
@@ -274,6 +265,13 @@ function goFollow(type: 'follow' | 'fans') {
   text-align: center;
   margin: 0;
   padding: 4px 16px 8px;
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+.member-card__bio--mobile .text-body-2 {
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .member-card__bio--wide {
