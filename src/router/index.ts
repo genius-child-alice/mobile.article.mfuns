@@ -15,6 +15,12 @@ import HomeView from '../views/home/HomeView.vue'
 import FeedDetailView from '../views/feed/FeedDetailView.vue'
 import ArticleDetailView from '../views/article/ArticleDetailView.vue'
 import PremiumView from '../views/premium/PremiumView.vue'
+import MediaView from '../views/media/MediaView.vue'
+import PlaylistMyListView from '../views/playlist/PlaylistMyListView.vue'
+import MemberSignView from '../views/member/MemberSignView.vue'
+import BlackroomView from '../views/blackroom/BlackroomView.vue'
+import MemberSignRankView from '../views/member/MemberSignRankView.vue'
+import PlaylistDetailView from '../views/playlist/PlaylistDetailView.vue'
 import {
   MAIN_TAB_PATHS,
   STATIC_PAGE_PATHS,
@@ -29,7 +35,12 @@ const routeComponents: Partial<Record<string, Component>> = {
   '/member/login': MemberLoginView,
   '/member/profile': MemberProfileView,
   '/member/history': MemberHistoryView,
+  '/member/sign': MemberSignView,
+  '/member/sign_rank': MemberSignRankView,
   '/premium': PremiumView,
+  '/media': MediaView,
+  '/playlist/mylist': PlaylistMyListView,
+  '/blackroom': BlackroomView,
   '/settings': SettingsView,
   '/settings/about': SettingsAboutView,
   '/settings/security': SettingsSecurityView,
@@ -42,6 +53,10 @@ const shellFullBleedPaths = new Set([
   '/member',
   '/member/history',
   '/member/profile',
+  '/member/sign',
+  '/blackroom',
+  '/playlist/mylist',
+  '/media',
   '/settings',
   '/settings/about',
   '/settings/security',
@@ -53,6 +68,7 @@ const shellStretchMainPaths = new Set([
   '/home',
   '/timeline',
   '/premium',
+  '/media',
   '/member/login',
   '/member/register',
   '/member/reset_password',
@@ -98,6 +114,16 @@ export const router = createRouter({
           component: ArticleDetailView,
           meta: {
             title: '文章详情',
+            showBottomNav: false,
+            shellStretchMain: true,
+          },
+        },
+        {
+          path: 'playlist/:id',
+          name: 'playlist-detail',
+          component: PlaylistDetailView,
+          meta: {
+            title: '收藏夹',
             showBottomNav: false,
             shellStretchMain: true,
           },

@@ -1,0 +1,549 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[292,
+123],
+{
+1116:function(t,
+e,
+n){
+"use strict";
+n(756)},
+1464:function(t,
+e,
+n){
+"use strict";
+n.r(e);
+var r=n(1),
+c=(n(37),
+n(43),
+n(11),
+n(25),
+n(18),
+n(707)),
+o=n(36),
+l=n(125),
+v={
+components:{
+Container:n(439).default},
+data:function(){
+return{
+time:[],
+sign:[],
+isSign:!1,
+loading:!1,
+dialog:!1,
+signAgainDay:"",
+signDay:0,
+signAllDay:0,
+accumulated:[]}},
+head:function(){
+return{
+title:"签到"}},
+computed:{
+getDate:function(){
+return(new Date).getDate()}},
+mounted:function(){
+var t=this;
+return Object(r.a)(regeneratorRuntime.mark((function e(){
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+t.refresh();
+case 2:return e.next=4,
+t.dayList();
+case 4:t.time=e.sent,
+t.isSign=t.getIsSign();
+case 6:case"end":return e.stop()}}),
+e)})))()},
+methods:{
+dayList:function(){
+return Object(r.a)(regeneratorRuntime.mark((function t(){
+var e,
+n,
+r,
+c,
+o,
+v,
+i,
+d;
+return regeneratorRuntime.wrap((function(t){
+for(;
+;
+)switch(t.prev=t.next){
+case 0:return t.next=2,
+Object(l.d)();
+case 2:for(e=t.sent,
+n=e.getFullYear(),
+r=e.getMonth()+1,
+0===(c=new Date(n,
+r-1,
+1).getDay())&&(c=7),
+o=new Date(n,
+r,
+0).getDate(),
+v=[],
+i=0;
+i<c;
+i++)v.push("");
+for(d=1;
+d<=o;
+d++)v.push(d);
+return console.log(v),
+t.abrupt("return",
+v);
+case 13:case"end":return t.stop()}}),
+t)})))()},
+signIn:function(){
+var t=this;
+return Object(r.a)(regeneratorRuntime.mark((function e(){
+var data;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return t.loading=!0,
+e.next=3,
+c.a.sign();
+case 3:return 1!=(data=e.sent).code?Object(o.a)(data.msg,
+"error"):Object(o.a)(data.msg,
+"success"),
+e.next=7,
+t.refresh();
+case 7:t.loading=!1,
+t.isSign=!0;
+case 9:case"end":return e.stop()}}),
+e)})))()},
+getIsSign:function(){
+var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:this.getDate;
+return 1==this.sign[t]},
+signAgain:function(){
+var t=this;
+return Object(r.a)(regeneratorRuntime.mark((function e(){
+var data;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+c.a.signAgain(t.signAgainDay);
+case 2:return 1!=(data=e.sent).code?Object(o.a)(data.msg,
+"error"):Object(o.a)(data.msg,
+"success"),
+e.next=6,
+t.refresh();
+case 6:case"end":return e.stop()}}),
+e)})))()},
+anginSign:function(t){
+this.getIsSign(t)||t>this.getDate||t==this.getDate||(this.signAgainDay=t,
+this.dialog=!0)},
+refresh:function(){
+var t=this;
+return Object(r.a)(regeneratorRuntime.mark((function e(){
+var data;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+c.a.getSignInfo();
+case 2:return data=e.sent,
+e.next=5,
+t.getAccumulatedReward();
+case 5:1==data.code&&(t.sign=data.data.list,
+t.signDay=data.data.month_times,
+t.signAllDay=data.data.all_times);
+case 6:case"end":return e.stop()}}),
+e)})))()},
+getColor:function(t){
+return this.getIsSign(t)?"green":t<=this.getDate?"rgba(0,
+0,
+0,
+0.4)":"rgba(0,
+0,
+0,
+0.1)"},
+getDark:function(t){
+return t<=this.getDate},
+getAccumulatedReward:function(){
+var t=this;
+return Object(r.a)(regeneratorRuntime.mark((function e(){
+var data,
+n,
+r,
+l;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+c.a.accumulatedAwards();
+case 2:if(1==(data=e.sent).code){
+e.next=6;
+break}return Object(o.a)(data.msg,
+"error"),
+e.abrupt("return",
+!1);
+case 6:n=[],
+r=regeneratorRuntime.mark((function t(){
+var content;
+return regeneratorRuntime.wrap((function(t){
+for(;
+;
+)switch(t.prev=t.next){
+case 0:content="",
+data.data[l].forEach((function(t){
+content+=t.desc+" "})),
+n.push({
+day:l,
+content:content});
+case 3:case"end":return t.stop()}}),
+t)})),
+e.t0=regeneratorRuntime.keys(data.data);
+case 9:if((e.t1=e.t0()).done){
+e.next=14;
+break}return l=e.t1.value,
+e.delegateYield(r(),
+"t2",
+12);
+case 12:e.next=9;
+break;
+case 14:return t.accumulated=n,
+e.abrupt("return",
+!0);
+case 16:case"end":return e.stop()}}),
+e)})))()}}},
+d=v,
+f=(n(1116),
+n(33)),
+component=Object(f.a)(d,
+(function(){
+var t=this,
+e=t._self._c;
+return e("div",
+[e("v-app-bar",
+{
+attrs:{
+dense:"",
+app:"",
+color:"primary",
+dark:""}},
+[e("v-app-bar-nav-icon",
+{
+on:{
+click:function(e){
+return t.$router.go(-1)}}},
+[e("v-icon",
+[t._v("mdi-arrow-left")])],
+1),
+t._v(" "),
+e("v-toolbar-title",
+[t._v(" 每日签到")]),
+t._v(" "),
+e("v-spacer"),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+text:"",
+to:"/member/sign_rank"}},
+[t._v("排行榜")])],
+1),
+t._v(" "),
+e("v-main",
+{
+staticStyle:{
+"padding-top":"48px"}},
+[e("container",
+[e("v-card",
+[e("v-card-text",
+{
+staticClass:"d-flex align-center"},
+[t._v("\n          累计已签到 \n          "),
+e("span",
+{
+staticClass:"link--text font-weight-black"},
+[t._v(t._s(t.signAllDay))]),
+t._v("\n           天\n          "),
+e("v-spacer"),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+disabled:t.isSign,
+loading:t.loading,
+color:"link",
+text:""},
+on:{
+click:t.signIn}},
+[t._v(t._s(t.isSign?"已签到":"签到")+"\n          ")])],
+1)],
+1),
+t._v(" "),
+e("v-card",
+{
+staticClass:"mt-2"},
+[e("v-card-subtitle",
+{
+staticClass:"d-flex"},
+[t._v("签到记录\n          "),
+e("v-spacer"),
+t._v("\n          本月累计签到 \n          "),
+e("span",
+{
+staticClass:"link--text font-weight-black"},
+[t._v(t._s(t.signDay))]),
+t._v("\n           天\n        ")],
+1),
+t._v(" "),
+e("v-card-text",
+{
+staticClass:"d-flex"},
+[e("table",
+{
+staticClass:"text-center grow table text-body-1"},
+[e("thead",
+[e("tr",
+[e("td",
+[t._v("一")]),
+t._v(" "),
+e("td",
+[t._v("二")]),
+t._v(" "),
+e("td",
+[t._v("三")]),
+t._v(" "),
+e("td",
+[t._v("四")]),
+t._v(" "),
+e("td",
+[t._v("五")]),
+t._v(" "),
+e("td",
+[t._v("六")]),
+t._v(" "),
+e("td",
+[t._v("日")])])]),
+t._v(" "),
+e("tbody",
+[t._l(t.time,
+(function(n,
+r){
+return[r%7==0?e("tr",
+{
+key:r},
+t._l(7,
+(function(i){
+return e("td",
+{
+key:i,
+class:{
+"today-border":t.time[i+r]==t.getDate}},
+[t.time[i+r]?e("v-sheet",
+{
+directives:[{
+name:"ripple",
+rawName:"v-ripple"}],
+attrs:{
+color:t.getColor(t.time[i+r]),
+dark:t.getDark(t.time[i+r])},
+on:{
+click:function(e){
+return t.anginSign(t.time[i+r])}}},
+[t._v("\n                      "+t._s(t.time[i+r])+"\n                    ")]):t._e()],
+1)})),
+0):t._e()]}))],
+2)])])],
+1),
+t._v(" "),
+e("v-card",
+{
+staticClass:"mt-2"},
+[e("v-card-subtitle",
+{
+staticClass:"d-flex"},
+[t._v("本月累计签到奖励")]),
+t._v(" "),
+e("v-list",
+t._l(t.accumulated,
+(function(n,
+r){
+return e("v-list-item",
+{
+key:r,
+attrs:{
+"two-line":""}},
+[e("v-list-item-content",
+[e("v-list-item-title",
+[t._v("第 "+t._s(n.day)+" 天")]),
+t._v(" "),
+e("v-list-item-subtitle",
+[t._v(t._s(n.content)+"\n              ")])],
+1),
+t._v(" "),
+n.day<=t.signDay?e("v-list-item-action-text",
+{
+staticClass:"link--text"},
+[t._v("\n              ✔已领取\n            ")]):e("v-list-item-action-text",
+[t._v("\n              未达到要求\n            ")])],
+1)})),
+1)],
+1)],
+1)],
+1),
+t._v(" "),
+e("v-dialog",
+{
+attrs:{
+"max-width":"500px"},
+model:{
+value:t.dialog,
+callback:function(e){
+t.dialog=e},
+expression:"dialog"}},
+[e("v-card",
+[e("v-card-title",
+[t._v("确认补签")]),
+t._v(" "),
+e("v-card-text",
+[e("p",
+[t._v("您确定要补签吗？此操作将消耗 "),
+e("b",
+[t._v("补签卡x1")])])]),
+t._v(" "),
+e("v-card-actions",
+[e("v-spacer"),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+color:"blue darken-1",
+text:""},
+on:{
+click:function(e){
+t.dialog=!1}}},
+[t._v("\n          取消\n        ")]),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+color:"blue darken-1",
+text:""},
+on:{
+click:function(e){
+t.dialog=!1,
+t.signAgain()}}},
+[t._v("\n          确认\n        ")])],
+1)],
+1)],
+1)],
+1)}),
+[],
+!1,
+null,
+"411a954f",
+null);
+e.default=component.exports},
+439:function(t,
+e,
+n){
+"use strict";
+n.r(e);
+var r={
+},
+c=n(33),
+component=Object(c.a)(r,
+(function(){
+var t=this,
+e=t._self._c;
+return e("div",
+[e("v-container",
+{
+staticClass:"pt-0 pt-sm-1",
+class:{
+"pa-0":t.$vuetify.breakpoint.xs},
+staticStyle:{
+"max-width":"1400px"}},
+[t._t("default")],
+2)],
+1)}),
+[],
+!1,
+null,
+null,
+null);
+e.default=component.exports},
+707:function(t,
+e,
+n){
+"use strict";
+var r=n(1),
+c=(n(18),
+n(4));
+e.a={
+sign:function(){
+return Object(r.a)(regeneratorRuntime.mark((function t(){
+return regeneratorRuntime.wrap((function(t){
+for(;
+;
+)switch(t.prev=t.next){
+case 0:return t.next=2,
+c.a.get("/sign/sign");
+case 2:return t.abrupt("return",
+t.sent);
+case 3:case"end":return t.stop()}}),
+t)})))()},
+getSignInfo:function(){
+return Object(r.a)(regeneratorRuntime.mark((function t(){
+return regeneratorRuntime.wrap((function(t){
+for(;
+;
+)switch(t.prev=t.next){
+case 0:return t.next=2,
+c.a.get("/sign/sign_list");
+case 2:return t.abrupt("return",
+t.sent);
+case 3:case"end":return t.stop()}}),
+t)})))()},
+getSignRank:function(){
+return Object(r.a)(regeneratorRuntime.mark((function t(){
+return regeneratorRuntime.wrap((function(t){
+for(;
+;
+)switch(t.prev=t.next){
+case 0:return t.next=2,
+c.a.get("/sign/sign_rank_today");
+case 2:return t.abrupt("return",
+t.sent);
+case 3:case"end":return t.stop()}}),
+t)})))()},
+signAgain:function(t){
+return Object(r.a)(regeneratorRuntime.mark((function e(){
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+c.a.post("/sign/sign_again",
+{
+day:t});
+case 2:return e.abrupt("return",
+e.sent);
+case 3:case"end":return e.stop()}}),
+e)})))()},
+accumulatedAwards:function(){
+return Object(r.a)(regeneratorRuntime.mark((function t(){
+return regeneratorRuntime.wrap((function(t){
+for(;
+;
+)switch(t.prev=t.next){
+case 0:return t.next=2,
+c.a.get("/sign/accumulated_awards");
+case 2:return t.abrupt("return",
+t.sent);
+case 3:case"end":return t.stop()}}),
+t)})))()}}},
+756:function(t,
+e,
+n){
+t.exports={
+}}}]);

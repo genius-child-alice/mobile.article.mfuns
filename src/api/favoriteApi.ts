@@ -5,9 +5,64 @@ export interface FavoriteListItem {
   name?: string
   desc?: string
   status?: number
+  count?: number
   is_favorite?: boolean
   updated_at?: number
   loading?: boolean
+}
+
+/** 我的收藏夹列表（不带 resource，参考站 getFavoriteList(userId, null, null)） */
+export function fetchMyFavoriteLists(
+  userId: number,
+  token: string,
+): Promise<MfunsApiEnvelope<{ list?: FavoriteListItem[] }>> {
+  return mfunsGet('/favorite/get_favorite_list', { user_id: userId }, token)
+}
+
+export function createFavoriteList(
+  name: string,
+  desc: string,
+  status: number,
+  token: string,
+): Promise<MfunsApiEnvelope<unknown>> {
+  return mfunsPost('/favorite/create_favorite_list', { name, desc, status }, token)
+}
+
+export function updateFavoriteList(
+  id: number,
+  name: string,
+  desc: string,
+  status: number,
+  token: string,
+): Promise<MfunsApiEnvelope<unknown>> {
+  return mfunsPost('/favorite/update_favorite_list', { id, name, desc, status }, token)
+}
+
+export function deleteFavoriteList(
+  id: number,
+  token: string,
+): Promise<MfunsApiEnvelope<unknown>> {
+  return mfunsPost('/favorite/delete_favorite_list', { id }, token)
+}
+
+export interface FavoriteInfoData {
+  favorite?: FavoriteListItem
+  user?: {
+    id?: number
+    name?: string
+    avatar?: string
+  }
+}
+
+export function fetchFavoriteInfo(
+  favoriteId: number,
+  token?: string | null,
+): Promise<MfunsApiEnvelope<FavoriteInfoData>> {
+  return mfunsGet<FavoriteInfoData>(
+    '/favorite/get_favorite_info',
+    { favorite_id: favoriteId },
+    token,
+  )
 }
 
 export function fetchIsFavorite(

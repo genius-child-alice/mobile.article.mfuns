@@ -7,6 +7,7 @@ export type MfunsAppBarTrailing =
   | 'create-article-actions'
   | 'playlist-new'
   | 'history-clear'
+  | 'sign-rank'
 
 export interface MfunsAppBarConfig {
   visible: boolean
@@ -54,7 +55,8 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     path === '/premium' ||
     path === '/create/video' ||
     path.startsWith('/feed/') ||
-    path.startsWith('/article/')
+    path.startsWith('/article/') ||
+    /^\/playlist\/\d+/.test(path)
   ) {
     return NO_BAR
   }
@@ -114,7 +116,7 @@ export function resolveAppBarConfig(path: string): MfunsAppBarConfig {
     '/member/profile': backBar('账号资料'),
     '/member/history': backBar('历史记录', { trailing: 'history-clear' }),
     '/member/badges': backBar('徽章设置'),
-    '/member/sign': backBar('每日签到'),
+    '/member/sign': backBar('每日签到', { trailing: 'sign-rank' }),
     '/member/sign_rank': backBar('签到排行榜'),
     '/member/reset_password': backBar('重置密码'),
     '/leaderboard': backBar('全站排行', { extensionTabs: ['全站排行'] }),

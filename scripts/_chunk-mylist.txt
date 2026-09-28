@@ -1,0 +1,1044 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[301,
+191,
+192],
+{
+1466:function(t,
+e,
+r){
+"use strict";
+r.r(e);
+r(42);
+var n=r(1),
+o=(r(18),
+r(20),
+r(45),
+r(582)),
+c=r(376),
+l=r(36),
+d={
+name:"MyList",
+components:{
+GoTopAndRefresh:r(438).default,
+PullRefresh:c.default},
+data:function(){
+return{
+myList:[],
+createData:{
+dialog:!1,
+loading:!1,
+name:"",
+desc:"",
+status:1},
+updateData:{
+dialog:!1,
+loading:!1,
+name:"",
+desc:"",
+status:1,
+id:0},
+deleteData:{
+dialog:!1,
+loading:!1,
+id:0}}},
+head:function(){
+return{
+title:"收藏夹"}},
+mounted:function(){
+this.$store.state.member_auth.isLogin||this.$router.replace("/member/login")},
+methods:{
+getListStatus:function(t){
+switch(t){
+case 1:return"公开";
+case 2:return"私有";
+case 3:return"仅链接访问"}},
+loadMyList:function(){
+var t=this;
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+var r;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+o.a.getFavoriteList(t.$store.state.member_auth.memberInfo.id,
+null,
+null);
+case 2:1===(r=e.sent).code&&(t.myList=r.data.list);
+case 4:case"end":return e.stop()}}),
+e)})))()},
+create:function(){
+var t=this;
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+var r;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return t.createData.loading=!0,
+e.next=3,
+o.a.createFavoriteList(t.createData.name,
+t.createData.desc,
+t.createData.status);
+case 3:if(1!==(r=e.sent).code){
+e.next=10;
+break}return t.createData={
+name:"",
+desc:"",
+status:1,
+dialog:!1,
+loading:!1},
+e.next=8,
+t.loadMyList();
+case 8:e.next=11;
+break;
+case 10:Object(l.a)(r.msg,
+"error");
+case 11:t.createData.loading=!1;
+case 12:case"end":return e.stop()}}),
+e)})))()},
+update:function(){
+var t=this;
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+var r;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return t.updateData.loading=!0,
+e.next=3,
+o.a.updateFavoriteList(t.updateData.id,
+t.updateData.name,
+t.updateData.desc,
+t.updateData.status);
+case 3:if(1!==(r=e.sent).code){
+e.next=10;
+break}return t.updateData={
+id:0,
+name:"",
+desc:"",
+status:1,
+dialog:!1,
+loading:!1},
+e.next=8,
+t.loadMyList();
+case 8:e.next=11;
+break;
+case 10:Object(l.a)(r.msg,
+"error");
+case 11:t.updateData.loading=!1;
+case 12:case"end":return e.stop()}}),
+e)})))()},
+deleteFavoriteList:function(){
+var t=this;
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+var r;
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return t.deleteData.loading=!0,
+e.next=3,
+o.a.deleteFavoriteList(t.deleteData.id);
+case 3:return 1===(r=e.sent).code?(t.deleteData.dialog=!1,
+Object(l.a)("删除成功")):Object(l.a)(r.msg,
+"error"),
+t.deleteData.loading=!1,
+e.next=8,
+t.loadMyList();
+case 8:case"end":return e.stop()}}),
+e)})))()}}},
+v=r(33),
+component=Object(v.a)(d,
+(function(){
+var t=this,
+e=t._self._c;
+return e("div",
+[e("v-app-bar",
+{
+attrs:{
+dense:"",
+app:"",
+color:"primary",
+dark:""}},
+[e("v-app-bar-nav-icon",
+{
+on:{
+click:function(e){
+return t.$router.go(-1)}}},
+[e("v-icon",
+[t._v("mdi-arrow-left")])],
+1),
+t._v(" "),
+e("v-toolbar-title",
+[t._v(" 收藏夹列表 ")]),
+t._v(" "),
+e("v-spacer"),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+icon:""},
+on:{
+click:function(e){
+t.createData.dialog=!0}}},
+[e("v-icon",
+[t._v(" mdi-plus ")])],
+1)],
+1),
+t._v(" "),
+e("v-main",
+{
+staticStyle:{
+"padding-top":"48px"}},
+[e("pull-refresh",
+{
+on:{
+refresh:function(e){
+t.loadMyList(),
+e()},
+download:function(e){
+t.loadMyList(),
+e(!0)}}},
+[e("v-list",
+[e("v-subheader",
+[t._v(" 我创建的收藏夹 ")]),
+t._v(" "),
+e("v-divider"),
+t._v(" "),
+t._l(t.myList,
+(function(r){
+return e("v-list-item",
+{
+directives:[{
+name:"ripple",
+rawName:"v-ripple"}],
+key:r.updated_at,
+on:{
+click:function(e){
+return t.$router.push("/playlist/"+r.id)}}},
+[e("v-list-item-content",
+[e("v-list-item-title",
+[t._v(t._s(r.name))]),
+t._v(" "),
+e("v-list-item-subtitle",
+[t._v("\n              "+t._s(t.getListStatus(r.status))+"\n              "+t._s(r.count)+"个内容\n            ")])],
+1),
+t._v(" "),
+e("v-list-item-action",
+[e("v-menu",
+{
+attrs:{
+"offset-y":""},
+scopedSlots:t._u([{
+key:"activator",
+fn:function(r){
+var n=r.on,
+o=r.attrs;
+return[e("v-btn",
+t._g(t._b({
+attrs:{
+icon:""}},
+"v-btn",
+o,
+!1),
+n),
+[e("v-icon",
+[t._v("mdi-dots-vertical")])],
+1)]}}],
+null,
+!0)},
+[t._v(" "),
+e("v-list",
+[e("v-list-item",
+{
+directives:[{
+name:"ripple",
+rawName:"v-ripple"}],
+on:{
+click:function(e){
+t.updateData.id=r.id,
+t.updateData.name=r.name,
+t.updateData.desc=r.desc,
+t.updateData.status=r.status,
+t.updateData.dialog=!0}}},
+[e("v-list-item-title",
+[t._v("修改收藏夹信息")])],
+1),
+t._v(" "),
+e("v-list-item",
+{
+directives:[{
+name:"ripple",
+rawName:"v-ripple"}],
+on:{
+click:function(e){
+t.deleteData.id=r.id,
+t.deleteData.dialog=!0}}},
+[e("v-list-item-title",
+[t._v("删除收藏夹")])],
+1)],
+1)],
+1)],
+1)],
+1)}))],
+2)],
+1)],
+1),
+t._v(" "),
+e("go-top-and-refresh",
+{
+attrs:{
+offset:4},
+on:{
+refresh:function(e){
+t.loadMyList(),
+e()}}}),
+t._v(" "),
+e("v-dialog",
+{
+attrs:{
+width:"500",
+persistent:""},
+model:{
+value:t.createData.dialog,
+callback:function(e){
+t.$set(t.createData,
+"dialog",
+e)},
+expression:"createData.dialog"}},
+[e("v-card",
+[e("v-card-title",
+[t._v(" 创建收藏夹 ")]),
+t._v(" "),
+e("v-card-text",
+[e("v-text-field",
+{
+attrs:{
+type:"text",
+counter:"20",
+label:"收藏夹名称",
+color:"link"},
+model:{
+value:t.createData.name,
+callback:function(e){
+t.$set(t.createData,
+"name",
+e)},
+expression:"createData.name"}}),
+t._v(" "),
+e("v-textarea",
+{
+attrs:{
+type:"text",
+counter:"50",
+rows:"3",
+label:"收藏夹描述",
+color:"link"},
+model:{
+value:t.createData.desc,
+callback:function(e){
+t.$set(t.createData,
+"desc",
+e)},
+expression:"createData.desc"}}),
+t._v(" "),
+e("v-radio-group",
+{
+attrs:{
+row:""},
+model:{
+value:t.createData.status,
+callback:function(e){
+t.$set(t.createData,
+"status",
+e)},
+expression:"createData.status"}},
+[e("v-radio",
+{
+attrs:{
+label:"公开",
+color:"link",
+value:1}}),
+t._v(" "),
+e("v-radio",
+{
+attrs:{
+label:"私有",
+color:"link",
+value:2}}),
+t._v(" "),
+e("v-radio",
+{
+attrs:{
+label:"仅链接访问",
+color:"link",
+value:3}})],
+1)],
+1),
+t._v(" "),
+e("v-card-actions",
+[e("v-spacer"),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+text:"",
+color:"error"},
+on:{
+click:function(e){
+t.createData.dialog=!1}}},
+[t._v("\n          取消\n        ")]),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+text:"",
+color:"link",
+loading:t.createData.loading},
+on:{
+click:t.create}},
+[t._v("\n          创建\n        ")])],
+1)],
+1)],
+1),
+t._v(" "),
+e("v-dialog",
+{
+attrs:{
+width:"500",
+persistent:""},
+model:{
+value:t.updateData.dialog,
+callback:function(e){
+t.$set(t.updateData,
+"dialog",
+e)},
+expression:"updateData.dialog"}},
+[e("v-card",
+[e("v-card-title",
+[t._v(" 修改收藏夹 ")]),
+t._v(" "),
+e("v-card-text",
+[e("v-text-field",
+{
+attrs:{
+type:"text",
+counter:"20",
+label:"收藏夹名称",
+color:"link"},
+model:{
+value:t.updateData.name,
+callback:function(e){
+t.$set(t.updateData,
+"name",
+e)},
+expression:"updateData.name"}}),
+t._v(" "),
+e("v-textarea",
+{
+attrs:{
+type:"text",
+counter:"50",
+rows:"3",
+label:"收藏夹描述",
+color:"link"},
+model:{
+value:t.updateData.desc,
+callback:function(e){
+t.$set(t.updateData,
+"desc",
+e)},
+expression:"updateData.desc"}}),
+t._v(" "),
+e("v-radio-group",
+{
+attrs:{
+row:""},
+model:{
+value:t.updateData.status,
+callback:function(e){
+t.$set(t.updateData,
+"status",
+e)},
+expression:"updateData.status"}},
+[e("v-radio",
+{
+attrs:{
+label:"公开",
+color:"link",
+value:1}}),
+t._v(" "),
+e("v-radio",
+{
+attrs:{
+label:"私有",
+color:"link",
+value:2}}),
+t._v(" "),
+e("v-radio",
+{
+attrs:{
+label:"仅链接访问",
+color:"link",
+value:3}})],
+1)],
+1),
+t._v(" "),
+e("v-card-actions",
+[e("v-spacer"),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+text:"",
+color:"error"},
+on:{
+click:function(e){
+t.updateData.dialog=!1}}},
+[t._v("\n          取消\n        ")]),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+text:"",
+color:"link",
+loading:t.updateData.loading},
+on:{
+click:t.update}},
+[t._v("\n          修改\n        ")])],
+1)],
+1)],
+1),
+t._v(" "),
+e("v-dialog",
+{
+attrs:{
+width:"500",
+persistent:""},
+model:{
+value:t.deleteData.dialog,
+callback:function(e){
+t.$set(t.deleteData,
+"dialog",
+e)},
+expression:"deleteData.dialog"}},
+[e("v-card",
+[e("v-card-title",
+[t._v(" 删除收藏夹 ")]),
+t._v(" "),
+e("v-card-text",
+[t._v(" 确定要删除收藏夹吗，删除后不可恢复 ")]),
+t._v(" "),
+e("v-card-actions",
+[e("v-spacer"),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+text:"",
+color:"link"},
+on:{
+click:function(e){
+t.deleteData.dialog=!1}}},
+[t._v("\n          取消\n        ")]),
+t._v(" "),
+e("v-btn",
+{
+attrs:{
+text:"",
+color:"error",
+loading:t.deleteData.loading},
+on:{
+click:t.deleteFavoriteList}},
+[t._v("\n          删除\n        ")])],
+1)],
+1)],
+1)],
+1)}),
+[],
+!1,
+null,
+null,
+null);
+e.default=component.exports},
+375:function(t,
+e,
+r){
+t.exports={
+}},
+376:function(t,
+e,
+r){
+"use strict";
+r.r(e);
+r(162),
+r(81);
+var n={
+name:"PullRefresh",
+props:{
+color:{
+type:String,
+default:"primary"},
+loadHeight:{
+type:Number,
+default:0},
+offset:{
+type:Number,
+default:0}},
+data:function(){
+return{
+start:0,
+move:0,
+loading:!1,
+downLoad:!1,
+cancel:!1,
+loadTime:0,
+notHaveMore:!1}},
+computed:{
+style:function(){
+return{
+transform:"translateY(".concat(this.moveY+this.offset,
+"px)")}},
+moveY:function(){
+var t=Math.pow(this.move,
+1);
+return t>120?120:t}},
+created:function(){
+this.scroll()},
+methods:{
+touchStart:function(t){
+this.start=t.changedTouches[0].pageY,
+this.$refs["pull-refresh-slot"].getBoundingClientRect().top<=0&&(this.cancel=!0)},
+touchMove:function(t){
+if(!(this.loading||this.$refs["pull-refresh-slot"].getBoundingClientRect().top<0||this.cancel)){
+0===this.start&&this.touchStart(t);
+var e=t.changedTouches[0].pageY-this.start;
+e>0&&(t.cancelable&&t.preventDefault(),
+this.move=e),
+0!==this.move&&t.preventDefault()}},
+touchEnd:function(t){
+var e=this;
+this.loading||(this.move>=150?(this.move=150,
+this.loading=!0,
+this.loadTime=Date.now(),
+this.$emit("refresh",
+(function(){
+e.notHaveMore=!1;
+var t=Date.now()-e.loadTime,
+r=0;
+t<200&&(r=500-t),
+setTimeout((function(){
+e.move=0,
+setTimeout((function(){
+e.loading=!1}),
+100)}),
+r)}))):(this.move=0,
+this.cancel=!1))},
+scroll:function(){
+var t=this;
+this.downLoad||this.loading||this.notHaveMore||(this.downLoad=!0,
+console.log("more"),
+this.$emit("download",
+(function(){
+var e=arguments.length>0&&void 0!==arguments[0]&&arguments[0];
+t.downLoad=!1,
+t.notHaveMore=e})))}}},
+o=n,
+c=(r(389),
+r(33)),
+component=Object(c.a)(o,
+(function(){
+var t=this,
+e=t._self._c;
+return e("div",
+{
+staticClass:"pull-refresh pb-6",
+staticStyle:{
+"min-height":"25vh"},
+on:{
+scroll:t.scroll,
+touchend:t.touchEnd,
+touchmove:t.touchMove,
+touchstart:t.touchStart}},
+[t.moveY||t.loading?e("v-avatar",
+{
+staticClass:"pull-refresh-logo",
+style:t.style,
+attrs:{
+elevation:1,
+color:"#fff",
+size:"41"}},
+[t.loading?e("v-progress-circular",
+{
+attrs:{
+color:t.color,
+indeterminate:"",
+size:"25",
+width:"3"}}):e("v-icon",
+{
+attrs:{
+color:t.color,
+size:"31"}},
+[t._v("mdi-arrow-down")])],
+1):t._e(),
+t._v(" "),
+e("div",
+{
+ref:"pull-refresh-slot",
+staticClass:"pull-refresh-slot"},
+[t._t("default")],
+2),
+t._v(" "),
+e("v-btn",
+{
+directives:[{
+name:"intersect",
+rawName:"v-intersect",
+value:{
+handler:t.scroll,
+options:{
+threshold:[1],
+rootMargin:"0px 0px ".concat(t.loadHeight,
+"px 0px")}},
+expression:"{
+\n      handler: scroll,
+\n      options: {
+\n        threshold: [1.0],
+\n        rootMargin: `0px 0px ${
+loadHeight}px 0px`\n      }\n    }"}],
+attrs:{
+loading:t.downLoad,
+block:"",
+text:"",
+disabled:t.notHaveMore},
+on:{
+click:t.scroll}},
+[t._v("\n    "+t._s(t.notHaveMore?"没有更多了":"加载更多")+"\n  ")])],
+1)}),
+[],
+!1,
+null,
+null,
+null);
+e.default=component.exports},
+389:function(t,
+e,
+r){
+"use strict";
+r(375)},
+438:function(t,
+e,
+r){
+"use strict";
+r.r(e);
+r(162);
+var n=r(453),
+o={
+name:"GoTopAndRefresh",
+props:{
+offset:{
+type:Number,
+default:0},
+position:{
+type:String,
+default:"fixed"}},
+data:function(){
+return{
+loading:!1,
+top:0,
+isShow:!1}},
+mounted:function(){
+this.isShow=!("ontouchstart"in window)},
+methods:{
+refresh:function(){
+var t=this;
+this.loading||(this.loading=!0,
+this.$emit("refresh",
+(function(){
+t.loading=!1})))},
+onScroll:function(){
+this.top=Object(n.a)()}}},
+c=r(33),
+component=Object(c.a)(o,
+(function(){
+var t=this,
+e=t._self._c;
+return t.isShow?e("v-speed-dial",
+{
+directives:[{
+name:"scroll",
+rawName:"v-scroll",
+value:t.onScroll,
+expression:"onScroll"}],
+style:"transform: translateY(-".concat(t.$vuetify.application.bottom+t.offset,
+"px)"),
+attrs:{
+bottom:"",
+fixed:"fixed"===t.position,
+absolute:"absolute"===t.position,
+right:""},
+scopedSlots:t._u([{
+key:"activator",
+fn:function(){
+return[t.top<100?e("v-btn",
+{
+attrs:{
+loading:t.loading,
+color:"pink",
+dark:"",
+fab:""},
+on:{
+click:t.refresh}},
+[e("v-icon",
+[t._v(" mdi-refresh ")])],
+1):e("v-btn",
+{
+attrs:{
+color:"pink",
+dark:"",
+fab:""},
+on:{
+click:function(e){
+return t.$vuetify.goTo(0)}}},
+[e("v-icon",
+[t._v(" mdi-format-vertical-align-top ")])],
+1)]},
+proxy:!0}],
+null,
+!1,
+1875187505)}):t._e()}),
+[],
+!1,
+null,
+null,
+null);
+e.default=component.exports},
+453:function(t,
+e,
+r){
+"use strict";
+function n(){
+var t=0;
+return document.documentElement&&document.documentElement.scrollTop?t=document.documentElement.scrollTop:document.body&&(t=document.body.scrollTop),
+t}r.d(e,
+"a",
+(function(){
+return n}))},
+582:function(t,
+e,
+r){
+"use strict";
+var n=r(1),
+o=(r(18),
+r(4));
+e.a={
+getFavoriteList:function(t,
+e,
+r){
+return Object(n.a)(regeneratorRuntime.mark((function n(){
+return regeneratorRuntime.wrap((function(n){
+for(;
+;
+)switch(n.prev=n.next){
+case 0:return n.next=2,
+o.a.get("/favorite/get_favorite_list",
+{
+params:{
+user_id:t,
+resource_id:e,
+resource_type:r}});
+case 2:return n.abrupt("return",
+n.sent);
+case 3:case"end":return n.stop()}}),
+n)})))()},
+createFavoriteList:function(t,
+desc,
+e){
+return Object(n.a)(regeneratorRuntime.mark((function r(){
+return regeneratorRuntime.wrap((function(r){
+for(;
+;
+)switch(r.prev=r.next){
+case 0:return r.next=2,
+o.a.post("/favorite/create_favorite_list",
+{
+name:t,
+desc:desc,
+status:e});
+case 2:return r.abrupt("return",
+r.sent);
+case 3:case"end":return r.stop()}}),
+r)})))()},
+updateFavoriteList:function(t,
+e,
+desc,
+r){
+return Object(n.a)(regeneratorRuntime.mark((function n(){
+return regeneratorRuntime.wrap((function(n){
+for(;
+;
+)switch(n.prev=n.next){
+case 0:return n.next=2,
+o.a.post("/favorite/update_favorite_list",
+{
+id:t,
+name:e,
+desc:desc,
+status:r});
+case 2:return n.abrupt("return",
+n.sent);
+case 3:case"end":return n.stop()}}),
+n)})))()},
+deleteFavoriteList:function(t){
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+o.a.post("/favorite/delete_favorite_list",
+{
+id:t});
+case 2:return e.abrupt("return",
+e.sent);
+case 3:case"end":return e.stop()}}),
+e)})))()},
+getFavoriteItem:function(t,
+e){
+return Object(n.a)(regeneratorRuntime.mark((function r(){
+return regeneratorRuntime.wrap((function(r){
+for(;
+;
+)switch(r.prev=r.next){
+case 0:return r.next=2,
+o.a.get("/favorite/get_favorite_item",
+{
+params:{
+favorite_id:t,
+last_id:e}});
+case 2:return r.abrupt("return",
+r.sent);
+case 3:case"end":return r.stop()}}),
+r)})))()},
+getFavoriteInfo:function(t){
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+o.a.get("/favorite/get_favorite_info",
+{
+params:{
+favorite_id:t}});
+case 2:return e.abrupt("return",
+e.sent);
+case 3:case"end":return e.stop()}}),
+e)})))()},
+removeFavorite:function(t){
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+o.a.post("/favorite/remove_favorite",
+{
+item_id:t});
+case 2:return e.abrupt("return",
+e.sent);
+case 3:case"end":return e.stop()}}),
+e)})))()},
+removeFavoriteByResource:function(t,
+e,
+r){
+return Object(n.a)(regeneratorRuntime.mark((function n(){
+return regeneratorRuntime.wrap((function(n){
+for(;
+;
+)switch(n.prev=n.next){
+case 0:return n.next=2,
+o.a.post("/favorite/remove_favorite_by_resource",
+{
+resource_id:t,
+list_id:e,
+type:r});
+case 2:return n.abrupt("return",
+n.sent);
+case 3:case"end":return n.stop()}}),
+n)})))()},
+addFavorite:function(t,
+e,
+r){
+return Object(n.a)(regeneratorRuntime.mark((function n(){
+return regeneratorRuntime.wrap((function(n){
+for(;
+;
+)switch(n.prev=n.next){
+case 0:return n.next=2,
+o.a.post("/favorite/add_favorite",
+{
+list_id:t,
+resource_id:e,
+type:r});
+case 2:return n.abrupt("return",
+n.sent);
+case 3:case"end":return n.stop()}}),
+n)})))()},
+isFavorite:function(t,
+e){
+return Object(n.a)(regeneratorRuntime.mark((function r(){
+return regeneratorRuntime.wrap((function(r){
+for(;
+;
+)switch(r.prev=r.next){
+case 0:return r.next=2,
+o.a.get("/favorite/is_favorite",
+{
+params:{
+resource_id:t,
+resource_type:e}});
+case 2:return r.abrupt("return",
+r.sent);
+case 3:case"end":return r.stop()}}),
+r)})))()},
+subscribe:function(t){
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+o.a.post("/favorite/subscribe_favorite",
+{
+id:t});
+case 2:return e.abrupt("return",
+e.sent);
+case 3:case"end":return e.stop()}}),
+e)})))()},
+subscribeList:function(){
+return Object(n.a)(regeneratorRuntime.mark((function t(){
+return regeneratorRuntime.wrap((function(t){
+for(;
+;
+)switch(t.prev=t.next){
+case 0:return t.next=2,
+o.a.get("/favorite/get_subscription_list");
+case 2:return t.abrupt("return",
+t.sent);
+case 3:case"end":return t.stop()}}),
+t)})))()},
+removeSubscribe:function(t){
+return Object(n.a)(regeneratorRuntime.mark((function e(){
+return regeneratorRuntime.wrap((function(e){
+for(;
+;
+)switch(e.prev=e.next){
+case 0:return e.next=2,
+o.a.post("/favorite/unsubscribe_favorite",
+{
+id:t});
+case 2:return e.abrupt("return",
+e.sent);
+case 3:case"end":return e.stop()}}),
+e)})))()}}}}]);

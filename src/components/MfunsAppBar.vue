@@ -9,6 +9,7 @@ import {
   useMemberHistoryClearDialog,
   notifyMemberHistoryCleared,
 } from '../composables/useMemberHistoryClear'
+import { openPlaylistCreateDialog } from '../composables/usePlaylistNew'
 import { clearMemberHistory } from '../api/memberUserApi'
 import { refreshMemberProfile } from '../composables/useMemberProfile'
 import { readMemberAuthState } from '../auth/memberSession'
@@ -209,7 +210,14 @@ async function confirmClearHistory() {
             <v-icon icon="mdi-send" />
           </v-btn>
         </template>
-        <v-btn v-else-if="config.trailing === 'playlist-new'" icon variant="text" color="white" aria-label="新建">
+        <v-btn
+          v-else-if="config.trailing === 'playlist-new'"
+          icon
+          variant="text"
+          color="white"
+          aria-label="新建"
+          @click="openPlaylistCreateDialog()"
+        >
           <v-icon icon="mdi-plus" />
         </v-btn>
         <v-btn
@@ -221,6 +229,14 @@ async function confirmClearHistory() {
           @click="openMemberHistoryClearDialog()"
         >
           <v-icon icon="mdi-delete-outline" />
+        </v-btn>
+        <v-btn
+          v-else-if="config.trailing === 'sign-rank'"
+          variant="text"
+          color="white"
+          :to="{ path: '/member/sign_rank' }"
+        >
+          排行榜
         </v-btn>
       </template>
     </template>
