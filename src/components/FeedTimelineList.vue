@@ -8,6 +8,7 @@ import {
   type FeedItem,
 } from '../api/feedsApi'
 import { readMemberAuthState } from '../auth/memberSession'
+import { filterTimelineFeeds } from '../utils/feedTimelineFilter'
 
 const props = defineProps<{
   newReply?: boolean
@@ -70,12 +71,19 @@ async function load(reset = false) {
       return false
     }
 
-    list.value.push(...res.data)
-    const last = list.value[list.value.length - 1]
-    if (last?.id != null) lastId.value = last.id
+    const raw = res.data
+    const incoming = filterTimelineFeeds(raw)
+    list.value.push(...incoming)
+
+    const apiLast = raw[raw.length - 1]
+    if (apiLast?.id != null) lastId.value = apiLast.id
     if (props.newReply) page.value += 1
 
-    return res.data.length > 0
+    if (incoming.length === 0) {
+      return load(false)
+    }
+
+    return true
   } finally {
     loading.value = false
     loadingMore.value = false
