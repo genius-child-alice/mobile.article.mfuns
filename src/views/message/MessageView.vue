@@ -129,7 +129,7 @@ onUnmounted(() => {
 
 <template>
   <!-- 参考 MessageList：左侧消息栏 + 右侧 nuxt-child -->
-  <div class="message-page background-image">
+  <div class="message-page background-image pt-2">
     <div class="message-container">
       <div v-show="showList" class="message-list" :class="{ fill: !mdAndUp }">
         <v-card class="message-list-bar" elevation="0">
@@ -228,13 +228,21 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.message-container {
+.message-page {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: calc(
     100vh - var(--mfuns-app-bar-height, 48px) - var(--mfuns-bottom-nav-height, 0px) -
       env(safe-area-inset-bottom, 0px)
   );
+  box-sizing: border-box;
+}
+
+.message-container {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  min-height: 0;
   overflow: hidden;
   width: 100%;
 }
