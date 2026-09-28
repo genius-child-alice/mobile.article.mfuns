@@ -22,7 +22,7 @@ const activeValue = computed(() => {
 <template>
   <!-- DOM/classes from m.mfuns layout (Vuetify 2 bottom-navigation + shift) -->
   <div
-    class="v-item-group v-bottom-navigation bottom-bar mfuns-bottom-nav v-bottom-navigation--grow v-bottom-navigation--fixed v-bottom-navigation--shift link--text"
+    class="v-item-group v-bottom-navigation bottom-bar mfuns-bottom-nav v-bottom-navigation--grow v-bottom-navigation--fixed v-bottom-navigation--shift"
     role="tablist"
   >
     <RouterLink
