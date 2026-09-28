@@ -59,6 +59,14 @@ const displayBadgeIds = computed(() => {
   return ids
 })
 
+const mobileWornBadgeIds = computed(() => {
+  const ids: number[] = []
+  for (const id of props.user.badges ?? []) {
+    if (id !== props.user.level_id && !ids.includes(id)) ids.push(id)
+  }
+  return ids
+})
+
 function nameColorClass(raw: string | undefined): string | undefined {
   const color = raw?.trim()
   if (!color) return undefined
@@ -124,16 +132,17 @@ function goFollow(type: 'follow' | 'fans') {
         </v-avatar>
       </div>
 
-      <v-container v-if="!smAndUp" fluid class="pt-0">
-        <div class="text-h6 text-center">
+      <div v-if="!smAndUp" class="member-card__mobile-info">
+        <div class="member-card__name-row member-card__name-row--mobile text-h6">
           <span :class="nameColorClass(user.name_color)">{{ user.name }}</span>
-          <v-icon v-if="user.gender === 1" icon="mdi-gender-male" color="#00b9ff" size="18" class="ms-1" />
-          <v-icon v-if="user.gender === 2" icon="mdi-gender-female" color="#ea7c8d" size="18" class="ms-1" />
+          <v-icon v-if="user.gender === 1" icon="mdi-gender-male" color="#00b9ff" size="18" />
+          <v-icon v-if="user.gender === 2" icon="mdi-gender-female" color="#ea7c8d" size="18" />
+          <MfunsBadge v-if="user.level_id" :id="user.level_id" />
         </div>
-        <div class="d-flex justify-center flex-wrap mt-1">
-          <MfunsBadge v-for="badgeId in displayBadgeIds" :key="`m-${badgeId}`" :id="badgeId" />
+        <div v-if="mobileWornBadgeIds.length" class="member-card__mobile-badges">
+          <MfunsBadge v-for="badgeId in mobileWornBadgeIds" :key="`m-${badgeId}`" :id="badgeId" />
         </div>
-        <div class="text-center text-body-2 mt-2 member-card__stats">
+        <div class="text-center text-body-2 member-card__stats member-card__stats--mobile">
           <span>UID{{ user.id }}</span>
           <span class="member-card__stat-link ms-2" @click.stop="goFollow('follow')">
             {{ displayFollowCount }} 关注
@@ -142,16 +151,18 @@ function goFollow(type: 'follow' | 'fans') {
             {{ displayFansCount }} 粉丝
           </span>
         </div>
-      </v-container>
+      </div>
 
-      <v-container
-        fluid
+      <div
         class="member-card__bio"
-        :class="{ 'member-card__bio--wide': smAndUp }"
+        :class="{
+          'member-card__bio--wide': smAndUp,
+          'member-card__bio--mobile': !smAndUp,
+        }"
       >
         <div v-if="user.bio" class="text-body-2 text-pre-wrap">{{ user.bio }}</div>
         <div v-else class="text-body-2 text-medium-emphasis">这个人很懒，还没有写签名呢~</div>
-      </v-container>
+      </div>
     </div>
   </v-card>
 </template>
@@ -224,12 +235,49 @@ function goFollow(type: 'follow' | 'fans') {
   opacity: 0.7;
 }
 
+.member-card__mobile-info {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 0 16px;
+  gap: 4px;
+}
+
+.member-card__mobile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.member-card__stats--mobile {
+  margin: 0;
+  line-height: 1.25;
+}
+
+.member-card__name-row--mobile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1.25;
+}
+
 .member-card__bio {
   padding-top: 8px;
 }
 
+.member-card__bio--mobile {
+  text-align: center;
+  margin: 0;
+  padding: 4px 16px 8px;
+}
+
 .member-card__bio--wide {
   width: 100%;
-  padding: 0 12px 0 0 !important;
+  padding: 0 12px 0 0;
 }
 </style>

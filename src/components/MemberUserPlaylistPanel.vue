@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { fetchMyFavoriteLists, type FavoriteListItem } from '../api/favoriteApi'
 import { readMemberAuthState } from '../auth/memberSession'
+import { useMemberAuth } from '../composables/useMemberAuth'
+import { refreshMemberProfile, useMemberProfile } from '../composables/useMemberProfile'
 
 const props = defineProps<{
   userId: number
 }>()
 
 const router = useRouter()
+const { isLoggedIn } = useMemberAuth()
+const { memberId } = useMemberProfile()
 const list = ref<FavoriteListItem[]>([])
 const loading = ref(false)
+
+const isSelf = computed(
+  () => props.userId > 0 && memberId.value > 0 && props.userId === memberId.value,
+)
 
 function listStatus(status?: number): string {
   switch (status) {
@@ -32,7 +40,9 @@ async function load() {
     const { token } = readMemberAuthState()
     const res = await fetchMyFavoriteLists(props.userId, token ?? '')
     if (res.code === 1 && Array.isArray(res.data?.list)) {
-      list.value = res.data.list.filter((item) => item.status === 1)
+      list.value = isSelf.value
+        ? res.data.list
+        : res.data.list.filter((item) => item.status === 1)
     } else {
       list.value = []
     }
@@ -42,9 +52,17 @@ async function load() {
 }
 
 watch(
-  () => props.userId,
+  () => [props.userId, memberId.value] as const,
   () => {
     void load()
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.userId,
+  () => {
+    if (isLoggedIn.value && !memberId.value) void refreshMemberProfile()
   },
   { immediate: true },
 )
@@ -62,6 +80,8 @@ watch(
         @click="router.push(`/playlist/${item.id}`)"
       />
     </v-list>
-    <div v-else class="text-center text-medium-emphasis py-12">暂无公开收藏夹</div>
+    <div v-else class="text-center text-medium-emphasis py-12">
+      {{ isSelf ? '暂无收藏夹' : '暂无公开收藏夹' }}
+    </div>
   </div>
 </template>
