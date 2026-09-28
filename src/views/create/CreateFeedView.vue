@@ -9,6 +9,7 @@ import MediaLibrary from '../../components/MediaLibrary.vue'
 import { useMemberAuth } from '../../composables/useMemberAuth'
 import { registerCreateFeedPublish } from '../../composables/useCreateActions'
 import { mfunsImageUrl } from '../../utils/mfunsImageUrl'
+import { quillPlainText } from '../../utils/quillContent'
 
 const MAX_IMAGES = 30
 
@@ -37,10 +38,8 @@ function requireToken(): string | null {
   return token
 }
 
-function plainText(html: string) {
-  const d = document.createElement('div')
-  d.innerHTML = html
-  return (d.textContent || '').trim()
+function plainText(raw: string) {
+  return quillPlainText(raw)
 }
 
 function addTag(name: string) {

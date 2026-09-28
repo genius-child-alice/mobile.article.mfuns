@@ -229,8 +229,8 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- 桌面：右侧操作列（参考 ContentInfoListItem） -->
-              <div v-if="!mobile" class="create-page__actions d-flex flex-column ga-2">
+              <!-- 桌面：右侧操作同一行（参考 ContentInfoListItem 横向按钮） -->
+              <div v-if="!mobile" class="create-page__actions d-flex flex-row flex-nowrap align-center ga-2">
                 <v-btn variant="outlined" color="link" @click="editItem(item)">
                   <v-icon start icon="mdi-circle-edit-outline" />
                   编辑
@@ -347,6 +347,7 @@ onMounted(() => {
 .create-page__actions {
   flex-shrink: 0;
   margin-left: 8px;
+  align-self: center;
 }
 
 .create-page__fab {

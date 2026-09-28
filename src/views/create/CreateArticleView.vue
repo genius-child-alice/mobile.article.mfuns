@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { fetchArticleCategories } from '../../api/categoryApi'
 import {
   createContributeArticle,
   fetchContributeGet,
@@ -17,7 +18,9 @@ import {
   registerCreateArticleSave,
   setCreateArticleTitle,
 } from '../../composables/useCreateActions'
+import { findCategoryPath } from '../../utils/categoryLookup'
 import { mfunsImageUrl } from '../../utils/mfunsImageUrl'
+import { quillPlainText } from '../../utils/quillContent'
 
 const route = useRoute()
 const router = useRouter()
@@ -56,10 +59,8 @@ function requireToken(): string | null {
   return token
 }
 
-function plainText(html: string) {
-  const d = document.createElement('div')
-  d.innerHTML = html
-  return (d.textContent || '').trim()
+function plainText(raw: string) {
+  return quillPlainText(raw)
 }
 
 function validate(forPublish: boolean): boolean {
@@ -208,7 +209,20 @@ async function loadEdit(id: number) {
   title.value = c.title ?? ''
   content.value = c.content ?? ''
   cid.value = c.category_id ?? 0
-  cateName.value = cid.value ? `分区 #${cid.value}` : '请选择分类'
+  cateName.value = '请选择分类'
+  if (cid.value) {
+    try {
+      const catRes = await fetchArticleCategories(token)
+      if (catRes.code === 1 && Array.isArray(catRes.data)) {
+        const found = findCategoryPath(catRes.data, cid.value)
+        cateName.value = found?.name ?? `分区 #${cid.value}`
+      } else {
+        cateName.value = `分区 #${cid.value}`
+      }
+    } catch {
+      cateName.value = `分区 #${cid.value}`
+    }
+  }
   cover.value = c.cover ?? ''
   copyright.value = c.copyright ?? 2
   result.value = c.result?.reason ?? ''

@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import Quill from 'quill'
+import 'quill/dist/quill.core.css'
+import { mfunsImageUrl } from '../utils/mfunsImageUrl'
+import { isQuillDeltaJson } from '../utils/quillContent'
 import CreateMemberSelectDialog, { type MentionUser } from './CreateMemberSelectDialog.vue'
 import MediaLibrary from './MediaLibrary.vue'
 
@@ -25,74 +29,165 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const editorRef = ref<HTMLElement | null>(null)
+const editorHost = ref<HTMLElement | null>(null)
+const toolbarId = `create-rich-toolbar-${Math.random().toString(36).slice(2, 9)}`
 const mediaRef = ref<InstanceType<typeof MediaLibrary> | null>(null)
 const memberOpen = ref(false)
-let syncing = false
-/** 打开选人前保存的选区，插入 mention 用 */
-let savedRange: Range | null = null
+const count = ref(0)
 
-const count = computed(() => {
-  const d = document.createElement('div')
-  d.innerHTML = props.modelValue || ''
-  return (d.textContent || '').length
-})
+let quill: Quill | null = null
+let selectionIndex = 0
+let syncing = false
+let blotsReady = false
 
 const overLimit = computed(() => count.value > props.maxCount)
 
-function getContent(): string {
-  return editorRef.value?.innerHTML ?? ''
-}
+const formats = computed(() =>
+  props.limit
+    ? ['bold', 'italic', 'strike', 'underline', 'mention']
+    : [
+        'bold',
+        'italic',
+        'strike',
+        'underline',
+        'header',
+        'image',
+        'mention',
+        'code',
+        'code-block',
+        'blockquote',
+        'list',
+        'divider',
+      ],
+)
 
-function setContent(html: string) {
-  if (!editorRef.value) return
-  syncing = true
-  editorRef.value.innerHTML = html || ''
-  syncing = false
+function ensureBlots() {
+  if (blotsReady) return
+  blotsReady = true
+
+  const Block = Quill.import('blots/block') as { tagName: string }
+  Block.tagName = 'DIV'
+  Quill.register(Block as any, true)
+
+  const Embed = Quill.import('blots/embed') as any
+  class MentionBlot extends Embed {
+    static blotName = 'mention'
+    static tagName = 'span'
+    static className = 'mention'
+
+    static create(value: { id: number | string; value: string }) {
+      const node = super.create() as HTMLElement
+      node.setAttribute('data-id', String(value.id))
+      node.setAttribute('data-value', value.value)
+      node.setAttribute('class', 'mention')
+      node.innerHTML = `@${value.value}`
+      return node
+    }
+
+    static value(node: HTMLElement) {
+      return {
+        id: node.getAttribute('data-id'),
+        value: node.getAttribute('data-value'),
+      }
+    }
+  }
+  Quill.register(MentionBlot as any)
+
+  const Image = Quill.import('formats/image') as any
+  class MfunsImageBlot extends Image {
+    static create(value: string) {
+      const node = super.create(value) as HTMLImageElement
+      const path = typeof value === 'string' ? value : ''
+      node.setAttribute('alt', path)
+      node.setAttribute('src', mfunsImageUrl(path, 1000) || path)
+      return node
+    }
+
+    static value(node: HTMLImageElement) {
+      return node.getAttribute('alt') || node.getAttribute('src') || ''
+    }
+  }
+  Quill.register(MfunsImageBlot as any, true)
+
+  const BlockEmbed = Quill.import('blots/block/embed') as any
+  class DividerBlot extends BlockEmbed {
+    static blotName = 'divider'
+    static tagName = 'hr'
+  }
+  Quill.register(DividerBlot as any)
 }
 
 function emitContent() {
-  if (syncing) return
-  emit('update:modelValue', getContent())
+  if (!quill || syncing) return
+  emit('update:modelValue', JSON.stringify(quill.getContents()))
+  refreshCount()
 }
 
-function exec(cmd: string, value?: string) {
-  editorRef.value?.focus()
-  document.execCommand(cmd, false, value)
-  emitContent()
-}
-
-function insertHtml(html: string) {
-  editorRef.value?.focus()
-  if (savedRange) {
-    const sel = window.getSelection()
-    sel?.removeAllRanges()
-    sel?.addRange(savedRange)
-    savedRange = null
+function refreshCount() {
+  if (!quill) {
+    count.value = 0
+    return
   }
-  document.execCommand('insertHTML', false, html)
-  emitContent()
-}
-
-function insertImage(path: string) {
-  if (!path) return
-  editorRef.value?.focus()
-  document.execCommand('insertImage', false, path)
-  emitContent()
-}
-
-function openMedia() {
-  saveSelection()
-  mediaRef.value?.open('select', 1)
+  const len = quill.getLength() - 1
+  count.value = len <= 0 ? 0 : len
 }
 
 function saveSelection() {
-  const sel = window.getSelection()
-  if (sel && sel.rangeCount > 0 && editorRef.value?.contains(sel.anchorNode)) {
-    savedRange = sel.getRangeAt(0).cloneRange()
-  } else {
-    savedRange = null
+  if (!quill) return
+  const range = quill.getSelection()
+  selectionIndex = range?.index ?? selectionIndex
+}
+
+function getContent(): string {
+  if (!quill) return props.modelValue || ''
+  return JSON.stringify(quill.getContents())
+}
+
+function setContent(content: string) {
+  if (!quill) return
+  syncing = true
+  try {
+    if (isQuillDeltaJson(content)) {
+      quill.setContents(JSON.parse(content))
+    } else if (content?.trim()) {
+      // HTML / 纯文本回退（对齐参考 clipboard.convert）
+      const delta = quill.clipboard.convert(content)
+      quill.setContents(delta as any)
+    } else {
+      quill.setContents([] as any)
+    }
+  } catch {
+    try {
+      const delta = quill.clipboard.convert(content || '')
+      quill.setContents(delta as any)
+    } catch {
+      quill.setText(content || '')
+    }
+  } finally {
+    syncing = false
+    refreshCount()
   }
+}
+
+function insertMention(user: MentionUser) {
+  if (!quill || !user.id || !user.name) return
+  const index = selectionIndex
+  quill.insertEmbed(index, 'mention', { id: user.id, value: user.name }, 'user')
+  selectionIndex = index + 1
+  nextTick(() => {
+    quill?.setSelection(selectionIndex, 0)
+    saveSelection()
+    emitContent()
+  })
+}
+
+function insertEmoji() {
+  if (!quill) return
+  saveSelection()
+  quill.insertText(selectionIndex, '😊', 'user')
+  selectionIndex += 2
+  quill.setSelection(selectionIndex, 0)
+  emitContent()
 }
 
 function openMemberSelect() {
@@ -100,50 +195,95 @@ function openMemberSelect() {
   memberOpen.value = true
 }
 
-/** 参考 Quill mention blot：span.mention[data-id][data-value] → @name */
-function insertMention(user: MentionUser) {
-  const name = (user.name || '').replace(/[<>&"]/g, '')
-  const id = user.id
-  if (!id || !name) return
-  const html =
-    `<span class="mention" data-id="${id}" data-value="${name}" contenteditable="false">@${name}</span>\u00a0`
-  insertHtml(html)
+function openMedia() {
+  saveSelection()
+  mediaRef.value?.open('select', 1)
 }
 
-function insertEmoji() {
+function insertImage(path: string) {
+  if (!quill || !path) return
+  const index = selectionIndex
+  quill.insertEmbed(index, 'image', path, 'user')
+  selectionIndex = index + 1
+  nextTick(() => {
+    quill?.setSelection(selectionIndex, 0)
+    saveSelection()
+    emitContent()
+  })
+}
+
+function insertDivider() {
+  if (!quill) return
   saveSelection()
-  insertHtml('😊')
+  quill.insertEmbed(selectionIndex, 'divider', true, 'user')
+  selectionIndex += 1
+  quill.setSelection(selectionIndex, 0)
+  emitContent()
 }
 
 onMounted(() => {
-  setContent(props.modelValue)
+  if (!editorHost.value) return
+  ensureBlots()
+
+  quill = new Quill(editorHost.value, {
+    modules: {
+      toolbar: {
+        container: `#${toolbarId}`,
+        handlers: {
+          divider: insertDivider,
+        },
+      },
+    },
+    formats: formats.value,
+    placeholder: props.placeholder,
+  })
+
+  quill.root.style.minHeight = `${props.height}px`
+  quill.root.classList.add('markdown-body')
+
+  quill.on('text-change', () => {
+    if (!syncing) emitContent()
+    else refreshCount()
+  })
+  quill.on('selection-change', (range) => {
+    if (range) selectionIndex = range.index
+  })
+
+  if (props.modelValue) setContent(props.modelValue)
+  else refreshCount()
 })
 
 watch(
   () => props.modelValue,
   (v) => {
-    if (v !== getContent()) setContent(v)
+    if (!quill) return
+    const cur = JSON.stringify(quill.getContents())
+    if (v !== cur) setContent(v || '')
+  },
+)
+
+watch(
+  () => props.height,
+  (h) => {
+    if (quill) quill.root.style.minHeight = `${h}px`
   },
 )
 
 onBeforeUnmount(() => {
   emitContent()
+  quill = null
 })
 
 defineExpose({ getContent, setContent })
 </script>
 
 <template>
-  <!-- 参考 ArticleEditor：编辑区 → 字数 → 底栏工具条；@ 打开 MemberSelect（动态/文章相同） -->
+  <!-- 参考 ArticleEditor：Quill 编辑区 → 字数 → 底栏工具条 -->
   <div class="create-rich-editor">
     <div
-      ref="editorRef"
-      class="create-rich-editor__body"
-      :style="{ height: `${height}px` }"
-      contenteditable="true"
-      :data-placeholder="placeholder"
-      @input="emitContent"
-      @blur="emitContent"
+      ref="editorHost"
+      class="create-rich-editor__host mf-rich-text-editor"
+      :style="{ minHeight: `${height}px` }"
     />
     <v-divider class="mb-1" />
     <div
@@ -152,56 +292,63 @@ defineExpose({ getContent, setContent })
     >
       {{ count }} / {{ maxCount }}
     </div>
-    <div class="create-rich-editor__toolbar d-flex flex-wrap">
-      <v-btn icon variant="text" size="small" @click="insertEmoji">
+    <div :id="toolbarId" class="create-rich-editor__toolbar d-flex flex-wrap">
+      <v-btn icon variant="text" size="small" type="button" @click="insertEmoji">
         <v-icon icon="mdi-emoticon-outline" />
       </v-btn>
-      <v-btn icon variant="text" size="small" @click="openMemberSelect">
+      <v-btn icon variant="text" size="small" type="button" @click="openMemberSelect">
         <v-icon icon="mdi-at" />
       </v-btn>
-      <v-btn v-if="!limit" icon variant="text" size="small" @click="openMedia">
+      <v-btn
+        v-if="!limit"
+        icon
+        variant="text"
+        size="small"
+        type="button"
+        @click="openMedia"
+      >
         <v-icon icon="mdi-image-outline" />
       </v-btn>
-      <v-btn icon variant="text" size="small" @click="exec('bold')">
-        <v-icon icon="mdi-format-bold" />
-      </v-btn>
-      <v-btn icon variant="text" size="small" @click="exec('italic')">
-        <v-icon icon="mdi-format-italic" />
-      </v-btn>
-      <v-btn icon variant="text" size="small" @click="exec('strikeThrough')">
-        <v-icon icon="mdi-format-strikethrough-variant" size="21" />
-      </v-btn>
-      <v-btn icon variant="text" size="small" @click="exec('underline')">
-        <v-icon icon="mdi-format-underline" size="21" />
-      </v-btn>
+      <button type="button" class="ql-bold create-rich-editor__ql-btn" aria-label="粗体">
+        <v-icon icon="mdi-format-bold" size="20" />
+      </button>
+      <button type="button" class="ql-italic create-rich-editor__ql-btn" aria-label="斜体">
+        <v-icon icon="mdi-format-italic" size="20" />
+      </button>
+      <button type="button" class="ql-strike create-rich-editor__ql-btn" aria-label="删除线">
+        <v-icon icon="mdi-format-strikethrough-variant" size="20" />
+      </button>
+      <button type="button" class="ql-underline create-rich-editor__ql-btn" aria-label="下划线">
+        <v-icon icon="mdi-format-underline" size="20" />
+      </button>
       <template v-if="!limit">
-        <v-btn icon variant="text" size="small" @click="exec('formatBlock', 'H1')">
-          <v-icon icon="mdi-format-header-1" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('formatBlock', 'H2')">
-          <v-icon icon="mdi-format-header-2" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('formatBlock', 'H3')">
-          <v-icon icon="mdi-format-header-3" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('formatBlock', 'PRE')">
-          <v-icon icon="mdi-code-tags" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('formatBlock', 'PRE')">
-          <v-icon icon="mdi-code-braces" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('formatBlock', 'BLOCKQUOTE')">
-          <v-icon icon="mdi-format-quote-open" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('insertUnorderedList')">
-          <v-icon icon="mdi-format-list-bulleted" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('insertOrderedList')">
-          <v-icon icon="mdi-format-list-numbered" />
-        </v-btn>
-        <v-btn icon variant="text" size="small" @click="exec('insertHorizontalRule')">
-          <v-icon icon="mdi-minus" />
-        </v-btn>
+        <button type="button" class="ql-header create-rich-editor__ql-btn" value="1" aria-label="H1">
+          <v-icon icon="mdi-format-header-1" size="20" />
+        </button>
+        <button type="button" class="ql-header create-rich-editor__ql-btn" value="2" aria-label="H2">
+          <v-icon icon="mdi-format-header-2" size="20" />
+        </button>
+        <button type="button" class="ql-header create-rich-editor__ql-btn" value="3" aria-label="H3">
+          <v-icon icon="mdi-format-header-3" size="20" />
+        </button>
+        <button type="button" class="ql-code create-rich-editor__ql-btn" aria-label="行内代码">
+          <v-icon icon="mdi-code-tags" size="20" />
+        </button>
+        <button type="button" class="ql-code-block create-rich-editor__ql-btn" aria-label="代码块">
+          <v-icon icon="mdi-code-braces" size="20" />
+        </button>
+        <button type="button" class="ql-blockquote create-rich-editor__ql-btn" aria-label="引用">
+          <v-icon icon="mdi-format-quote-open" size="20" />
+        </button>
+        <button type="button" class="ql-list create-rich-editor__ql-btn" value="bullet" aria-label="无序">
+          <v-icon icon="mdi-format-list-bulleted" size="20" />
+        </button>
+        <button type="button" class="ql-list create-rich-editor__ql-btn" value="ordered" aria-label="有序">
+          <v-icon icon="mdi-format-list-numbered" size="20" />
+        </button>
+        <button type="button" class="ql-divider create-rich-editor__ql-btn" aria-label="分割线">
+          <v-icon icon="mdi-minus" size="20" />
+        </button>
       </template>
     </div>
     <MediaLibrary v-if="!limit" ref="mediaRef" title="插入图片" @select="insertImage" />
@@ -210,26 +357,53 @@ defineExpose({ getContent, setContent })
 </template>
 
 <style scoped>
-.create-rich-editor__body {
-  outline: none;
-  overflow: auto;
-  line-height: 1.6;
-  padding: 8px 4px;
+.create-rich-editor__host {
+  width: 100%;
 }
 
-.create-rich-editor__body:empty::before {
-  content: attr(data-placeholder);
+.create-rich-editor__host :deep(.ql-editor) {
+  min-height: inherit;
+  padding: 8px 4px;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-y: auto;
+}
+
+.create-rich-editor__host :deep(.ql-editor.ql-blank::before) {
+  left: 4px;
+  right: 4px;
+  font-style: normal;
   color: rgba(var(--v-theme-on-surface), 0.38);
 }
 
-.create-rich-editor__body :deep(img) {
+.create-rich-editor__host :deep(.mention) {
+  color: rgb(var(--v-theme-link));
+  white-space: nowrap;
+}
+
+.create-rich-editor__host :deep(img) {
   max-width: 100%;
   height: auto;
 }
 
-.create-rich-editor__body :deep(.mention) {
+.create-rich-editor__ql-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  border-radius: 50%;
+  color: inherit;
+  cursor: pointer;
+}
+
+.create-rich-editor__ql-btn:hover {
+  background: rgba(var(--v-theme-on-surface), 0.06);
+}
+
+.create-rich-editor__ql-btn.ql-active {
   color: rgb(var(--v-theme-link));
-  cursor: default;
-  white-space: nowrap;
 }
 </style>
